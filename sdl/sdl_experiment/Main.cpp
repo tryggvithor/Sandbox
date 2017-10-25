@@ -1,38 +1,79 @@
 #include <SDL.h>
 #include <stdio.h>
 
+
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+const char* IMG_TEST = "test_image.bmp";
+
+bool init();
+bool loadMedia();
+void close();
+
+SDL_Window* gWindow = NULL;
+SDL_Surface* gScreenSurface = NULL;
+SDL_Surface* gHelloWorld = NULL;
+
 
 int main(int argc, char* args[])
 {
-	SDL_Window* window = NULL;
-	SDL_Surface* screenSurface = NULL;
-
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (!init())
 	{
-		printf("Init failure, error: %s\n", SDL_GetError());
+		printf("Failed to initalize\n");
+		return 0;
 	}
-	else
+	if (!loadMedia())
 	{
-		window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if (window == NULL)
-		{
-			printf("Window creation failed, error: %s\n", SDL_GetError());
-		}
-		else
-		{
-			screenSurface = SDL_GetWindowSurface(window);
-
-			SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0x00));
-
-			SDL_UpdateWindowSurface(window);
-			SDL_Delay(3000);
-		}
+		printf("Failed to load media\n");
+		return 0;
 	}
 
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+	SDL_UpdateWindowSurface(gWindow);
+	SDL_Delay(3000);
 	
 	return 0;
+}
+
+bool init()
+{
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL_INIT failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+
+	gWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (gWindow == NULL)
+	{
+		printf("SDL_CreateWindow failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+
+	gScreenSurface = SDL_GetWindowSurface(gWindow);
+
+	return true;
+}
+
+bool loadMedia()
+{
+	gHelloWorld = SDL_LoadBMP(IMG_TEST);
+	if (gHelloWorld == NULL)
+	{
+		printf("Failed to load image %s, error: %s\n", IMG_TEST, SDL_GetError());
+		return false;
+	}
+
+	return true;
+}
+
+void close()
+{
+	SDL_FreeSurface(gScreenSurface);
+	gHelloWorld = NULL;
+
+	SDL_DestroyWindow(gWindow);
+	gWindow = NULL;
+
+	SDL_Quit();
 }
