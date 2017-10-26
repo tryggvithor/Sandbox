@@ -1,10 +1,10 @@
 #include <SDL.h>
 #include <stdio.h>
+#include "Constants.h"
 
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-const char* IMG_TEST = "test_image.bmp";
+const int SCREEN_WIDTH = 1600;
+const int SCREEN_HEIGHT = 900;
 
 bool init();
 bool loadMedia();
@@ -58,10 +58,10 @@ bool init()
 
 bool loadMedia()
 {
-	gHelloWorld = SDL_LoadBMP(IMG_TEST);
+	gHelloWorld = SDL_LoadBMP(Constants::IMG_TEST);
 	if (gHelloWorld == NULL)
 	{
-		printf("Failed to load image %s, error: %s\n", IMG_TEST, SDL_GetError());
+		printf("Failed to load image %s, error: %s\n", Constants::IMG_TEST, SDL_GetError());
 		return false;
 	}
 
