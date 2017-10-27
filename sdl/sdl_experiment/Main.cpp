@@ -3,16 +3,17 @@
 #include "Constants.h"
 
 
-const int SCREEN_WIDTH = 1600;
-const int SCREEN_HEIGHT = 900;
-
 bool init();
 bool loadMedia();
 void close();
 
+bool hasQuit = false;
+
+
 SDL_Window* gWindow = NULL;
 SDL_Surface* gScreenSurface = NULL;
 SDL_Surface* gHelloWorld = NULL;
+SDL_Event e;
 
 
 int main(int argc, char* args[])
@@ -28,10 +29,20 @@ int main(int argc, char* args[])
 		return 0;
 	}
 
-	SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-	SDL_UpdateWindowSurface(gWindow);
-	SDL_Delay(3000);
-	
+	while (!hasQuit)
+	{
+		while (SDL_PollEvent(&e) != 0)
+		{
+			if (e.type == SDL_QUIT)
+			{
+				hasQuit = true;
+			}
+		}
+
+		SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+		SDL_UpdateWindowSurface(gWindow);
+	}
+
 	close();
 	return 0;
 }
@@ -44,7 +55,7 @@ bool init()
 		return false;
 	}
 
-	gWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	gWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if (gWindow == NULL)
 	{
 		printf("SDL_CreateWindow failed, error: %s\n", SDL_GetError());
