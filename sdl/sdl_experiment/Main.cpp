@@ -1,19 +1,14 @@
 #include <SDL.h>
 #include <stdio.h>
 #include "Constants.h"
+#include "Globals.h"
 
 
 bool init();
 bool loadMedia();
 void close();
+SDL_Surface* loadSurface(char* filePath);
 
-bool hasQuit = false;
-
-
-SDL_Window* gWindow = NULL;
-SDL_Surface* gScreenSurface = NULL;
-SDL_Surface* gHelloWorld = NULL;
-SDL_Event e;
 
 
 int main(int argc, char* args[])
@@ -29,18 +24,39 @@ int main(int argc, char* args[])
 		return 0;
 	}
 
-	while (!hasQuit)
+	SDL_Event e;
+	Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::DEFAULT];
+
+	while (!Globals::hasQuit)
 	{
 		while (SDL_PollEvent(&e) != 0)
 		{
 			if (e.type == SDL_QUIT)
 			{
-				hasQuit = true;
+				Globals::hasQuit = true;
+			}
+			if (e.type == SDL_KEYDOWN)
+			{
+				switch (e.key.keysym.sym)
+				{
+				case SDLK_UP:
+					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::UP];
+					break;
+				case SDLK_DOWN:
+					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::DOWN];
+					break;
+				case SDLK_LEFT:
+					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::LEFT];
+					break;
+				case SDLK_RIGHT:
+					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::RIGHT];
+					break;
+				}
 			}
 		}
 
-		SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-		SDL_UpdateWindowSurface(gWindow);
+		SDL_BlitSurface(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
+		SDL_UpdateWindowSurface(Globals::window);
 	}
 
 	close();
@@ -55,37 +71,55 @@ bool init()
 		return false;
 	}
 
-	gWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	if (gWindow == NULL)
+	Globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (Globals::window == NULL)
 	{
 		printf("SDL_CreateWindow failed, error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	gScreenSurface = SDL_GetWindowSurface(gWindow);
+	Globals::screenSurface = SDL_GetWindowSurface(Globals::window);
 
 	return true;
 }
 
 bool loadMedia()
 {
-	gHelloWorld = SDL_LoadBMP(Constants::IMG_TEST);
-	if (gHelloWorld == NULL)
+	for (int i = 0; i < Globals::ArrowKeySurface::COUNT; i++)
 	{
-		printf("Failed to load image %s, error: %s\n", Constants::IMG_TEST, SDL_GetError());
-		return false;
+		Globals::arrowKeySurfaces[i] = loadSurface(Globals::arrowKeyFilePaths[i]);
+		if (Globals::arrowKeySurfaces[i] == NULL)
+		{
+			return false;
+		}
 	}
 
 	return true;
 }
 
+SDL_Surface* loadSurface(char* filePath)
+{
+	SDL_Surface* loadedSurface = SDL_LoadBMP(filePath);
+	if (loadedSurface == NULL)
+	{
+		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+	return loadedSurface;
+}
+
 void close()
 {
-	SDL_FreeSurface(gScreenSurface);
-	gHelloWorld = NULL;
+	SDL_FreeSurface(Globals::screenSurface);
+	
+	for (int i = 0; i < Globals::ArrowKeySurface::COUNT-1; i++)
+	{
+		SDL_FreeSurface(Globals::arrowKeySurfaces[i]);
+		Globals::arrowKeySurfaces[i] = NULL;
+	}
 
-	SDL_DestroyWindow(gWindow);
-	gWindow = NULL;
+	SDL_DestroyWindow(Globals::window);
+	Globals::window = NULL;
 
 	SDL_Quit();
 }
