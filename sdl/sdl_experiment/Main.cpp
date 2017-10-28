@@ -1,6 +1,5 @@
 #include <SDL.h>
 #include <stdio.h>
-#include "Constants.h"
 #include "Globals.h"
 
 
@@ -71,7 +70,7 @@ bool init()
 		return false;
 	}
 
-	Globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	Globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Globals::screenWidth, Globals::screenHeight, SDL_WINDOW_SHOWN);
 	if (Globals::window == NULL)
 	{
 		printf("SDL_CreateWindow failed, error: %s\n", SDL_GetError());
