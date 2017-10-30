@@ -25,6 +25,11 @@ int main(int argc, char* args[])
 
 	SDL_Event e;
 	Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::DEFAULT];
+	SDL_Rect stretchRect;
+	stretchRect.x = 0;
+	stretchRect.y = 0;
+	stretchRect.w = Globals::screenWidth;
+	stretchRect.h = Globals::screenHeight;
 
 	while (!Globals::hasQuit)
 	{
@@ -54,6 +59,7 @@ int main(int argc, char* args[])
 			}
 		}
 
+		SDL_BlitScaled(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
 		SDL_BlitSurface(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
 		SDL_UpdateWindowSurface(Globals::window);
 	}
@@ -98,13 +104,24 @@ bool loadMedia()
 
 SDL_Surface* loadSurface(char* filePath)
 {
+	SDL_Surface* optimizedSurface = NULL;
+
+	//Load image
 	SDL_Surface* loadedSurface = SDL_LoadBMP(filePath);
 	if (loadedSurface == NULL)
 	{
 		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
 		return NULL;
 	}
-	return loadedSurface;
+
+	//Optimize the loaded image
+	optimizedSurface = SDL_ConvertSurface(loadedSurface, Globals::screenSurface->format, NULL);
+	if (optimizedSurface == NULL)
+	{
+		printf("Failed to optimize image %s, error: %s\n", filePath, SDL_GetError());
+	}
+
+	return optimizedSurface;
 }
 
 void close()
