@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_image.h>
 #include <stdio.h>
 #include "Globals.h"
 
@@ -76,6 +77,13 @@ bool init()
 		return false;
 	}
 
+	int imgFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imgFlags) & imgFlags))
+	{
+		printf("SDL_image failed to initialize, error: %s\n", IMG_GetError());
+		return false;
+	}
+
 	Globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Globals::screenWidth, Globals::screenHeight, SDL_WINDOW_SHOWN);
 	if (Globals::window == NULL)
 	{
@@ -107,18 +115,19 @@ SDL_Surface* loadSurface(char* filePath)
 	SDL_Surface* optimizedSurface = NULL;
 
 	//Load image
-	SDL_Surface* loadedSurface = SDL_LoadBMP(filePath);
+	SDL_Surface* loadedSurface = IMG_Load(filePath);
 	if (loadedSurface == NULL)
 	{
 		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
 		return NULL;
 	}
 
-	//Optimize the loaded image
+	//Optimize the loaded image to the correct format
 	optimizedSurface = SDL_ConvertSurface(loadedSurface, Globals::screenSurface->format, NULL);
 	if (optimizedSurface == NULL)
 	{
 		printf("Failed to optimize image %s, error: %s\n", filePath, SDL_GetError());
+		return NULL
 	}
 
 	return optimizedSurface;

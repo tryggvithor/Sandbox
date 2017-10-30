@@ -11,11 +11,11 @@ SDL_Surface* Globals::currentSurface = NULL;
 
 char* Globals::arrowKeyFilePaths[] =
 {
-	"images/default.bmp",
-	"images/up.bmp",
-	"images/down.bmp",
-	"images/left.bmp",
-	"images/right.bmp"
+	"images/default.png",
+	"images/up.png",
+	"images/down.png",
+	"images/left.png",
+	"images/right.png"
 };
 
 SDL_Surface* Globals::arrowKeySurfaces[ArrowKeySurface::COUNT];
