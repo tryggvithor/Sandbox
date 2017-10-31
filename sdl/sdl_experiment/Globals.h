@@ -18,9 +18,12 @@ public:
 	static int screenWidth;
 	static int screenHeight;
 	static bool hasQuit;
+	static SDL_Renderer* renderer;
 	static SDL_Window* window;
+	static SDL_Texture* texture;
 	static SDL_Surface* screenSurface;
 	static SDL_Surface* currentSurface;
+	static char* hairmanFilePath;
 	static char* arrowKeyFilePaths[];
 	static SDL_Surface* arrowKeySurfaces[];
 };

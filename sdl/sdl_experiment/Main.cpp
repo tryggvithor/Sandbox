@@ -7,6 +7,7 @@
 bool init();
 bool loadMedia();
 void close();
+SDL_Texture* loadTexture(char* filePath);
 SDL_Surface* loadSurface(char* filePath);
 
 
@@ -36,7 +37,7 @@ int main(int argc, char* args[])
 	{
 		while (SDL_PollEvent(&e) != 0)
 		{
-			if (e.type == SDL_QUIT)
+			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
 			{
 				Globals::hasQuit = true;
 			}
@@ -59,10 +60,16 @@ int main(int argc, char* args[])
 				}
 			}
 		}
-
+		/*
 		SDL_BlitScaled(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
 		SDL_BlitSurface(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
 		SDL_UpdateWindowSurface(Globals::window);
+		*/
+		SDL_RenderClear(Globals::renderer);
+
+		SDL_RenderCopy(Globals::renderer, Globals::texture, NULL, NULL);
+
+		SDL_RenderPresent(Globals::renderer);
 	}
 
 	close();
@@ -91,18 +98,36 @@ bool init()
 		return false;
 	}
 
+	Globals::renderer = SDL_CreateRenderer(Globals::window, -1, SDL_RENDERER_ACCELERATED);
+	if (Globals::renderer == NULL)
+	{
+		printf("SDL_CreateRenderer failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+
 	Globals::screenSurface = SDL_GetWindowSurface(Globals::window);
+	SDL_SetRenderDrawColor(Globals::renderer, 0xff, 0xff, 0xff, 0xff);
 
 	return true;
 }
 
 bool loadMedia()
 {
+	//Texture
+	Globals::texture = loadTexture(Globals::hairmanFilePath);
+	if (Globals::texture == NULL)
+	{
+		printf("Failed to load texture image %s\n", Globals::hairmanFilePath);
+		return false;
+	}
+
+	//Surfaces
 	for (int i = 0; i < Globals::ArrowKeySurface::COUNT; i++)
 	{
 		Globals::arrowKeySurfaces[i] = loadSurface(Globals::arrowKeyFilePaths[i]);
 		if (Globals::arrowKeySurfaces[i] == NULL)
 		{
+			printf("Failed to load surface %s\n", Globals::arrowKeyFilePaths[i]);
 			return false;
 		}
 	}
@@ -110,11 +135,45 @@ bool loadMedia()
 	return true;
 }
 
+SDL_Texture* loadTexture(char* filePath)
+{
+	if (Globals::renderer == NULL)
+	{
+		printf("loadTexture() failed for %s, global renderer was NULL\n", filePath);
+		return NULL;
+	}
+	SDL_Texture* newTexture = NULL;
+
+	//Load the image
+	SDL_Surface* loadedSurface = IMG_Load(filePath);
+	if (loadedSurface == NULL)
+	{
+		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+
+	//Create a texture from surface pixels
+	newTexture = SDL_CreateTextureFromSurface(Globals::renderer, loadedSurface);
+	if (newTexture == NULL)
+	{
+		printf("Failed to create texture from %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+
+	SDL_FreeSurface(loadedSurface);
+	return newTexture;
+}
+
 SDL_Surface* loadSurface(char* filePath)
 {
+	if (Globals::screenSurface == NULL)
+	{
+		printf("loadSurface() failed for %s, global screenSurface was NULL\n", filePath);
+		return NULL;
+	}
 	SDL_Surface* optimizedSurface = NULL;
 
-	//Load image
+	//Load the image
 	SDL_Surface* loadedSurface = IMG_Load(filePath);
 	if (loadedSurface == NULL)
 	{
@@ -127,7 +186,7 @@ SDL_Surface* loadSurface(char* filePath)
 	if (optimizedSurface == NULL)
 	{
 		printf("Failed to optimize image %s, error: %s\n", filePath, SDL_GetError());
-		return NULL
+		return NULL;
 	}
 
 	return optimizedSurface;
@@ -135,16 +194,25 @@ SDL_Surface* loadSurface(char* filePath)
 
 void close()
 {
+	//Surfaces
 	SDL_FreeSurface(Globals::screenSurface);
-	
 	for (int i = 0; i < Globals::ArrowKeySurface::COUNT-1; i++)
 	{
 		SDL_FreeSurface(Globals::arrowKeySurfaces[i]);
 		Globals::arrowKeySurfaces[i] = NULL;
 	}
 
+	//Textures
+	SDL_DestroyTexture(Globals::texture);
+	Globals::texture = NULL;
+
+	//Window
+	SDL_DestroyRenderer(Globals::renderer);
 	SDL_DestroyWindow(Globals::window);
+	Globals::renderer = NULL;
 	Globals::window = NULL;
 
+	//SDL subsystems
+	IMG_Quit();
 	SDL_Quit();
 }
