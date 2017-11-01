@@ -26,12 +26,6 @@ int main(int argc, char* args[])
 	}
 
 	SDL_Event e;
-	Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::DEFAULT];
-	SDL_Rect stretchRect;
-	stretchRect.x = 0;
-	stretchRect.y = 0;
-	stretchRect.w = Globals::screenWidth;
-	stretchRect.h = Globals::screenHeight;
 
 	while (!Globals::hasQuit)
 	{
@@ -43,28 +37,10 @@ int main(int argc, char* args[])
 			}
 			if (e.type == SDL_KEYDOWN)
 			{
-				switch (e.key.keysym.sym)
-				{
-				case SDLK_UP:
-					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::UP];
-					break;
-				case SDLK_DOWN:
-					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::DOWN];
-					break;
-				case SDLK_LEFT:
-					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::LEFT];
-					break;
-				case SDLK_RIGHT:
-					Globals::currentSurface = Globals::arrowKeySurfaces[Globals::ArrowKeySurface::RIGHT];
-					break;
-				}
+				
 			}
 		}
-		/*
-		SDL_BlitScaled(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
-		SDL_BlitSurface(Globals::currentSurface, NULL, Globals::screenSurface, NULL);
-		SDL_UpdateWindowSurface(Globals::window);
-		*/
+
 		SDL_RenderClear(Globals::renderer);
 
 		SDL_RenderCopy(Globals::renderer, Globals::texture, NULL, NULL);
@@ -113,23 +89,11 @@ bool init()
 
 bool loadMedia()
 {
-	//Texture
 	Globals::texture = loadTexture(Globals::hairmanFilePath);
 	if (Globals::texture == NULL)
 	{
 		printf("Failed to load texture image %s\n", Globals::hairmanFilePath);
 		return false;
-	}
-
-	//Surfaces
-	for (int i = 0; i < Globals::ArrowKeySurface::COUNT; i++)
-	{
-		Globals::arrowKeySurfaces[i] = loadSurface(Globals::arrowKeyFilePaths[i]);
-		if (Globals::arrowKeySurfaces[i] == NULL)
-		{
-			printf("Failed to load surface %s\n", Globals::arrowKeyFilePaths[i]);
-			return false;
-		}
 	}
 
 	return true;
@@ -194,14 +158,6 @@ SDL_Surface* loadSurface(char* filePath)
 
 void close()
 {
-	//Surfaces
-	SDL_FreeSurface(Globals::screenSurface);
-	for (int i = 0; i < Globals::ArrowKeySurface::COUNT-1; i++)
-	{
-		SDL_FreeSurface(Globals::arrowKeySurfaces[i]);
-		Globals::arrowKeySurfaces[i] = NULL;
-	}
-
 	//Textures
 	SDL_DestroyTexture(Globals::texture);
 	Globals::texture = NULL;

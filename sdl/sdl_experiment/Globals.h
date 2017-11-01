@@ -5,16 +5,6 @@
 class Globals
 {
 public:
-	enum ArrowKeySurface
-	{
-		DEFAULT,
-		UP,
-		DOWN,
-		LEFT,
-		RIGHT,
-		COUNT
-	};
-
 	static int screenWidth;
 	static int screenHeight;
 	static bool hasQuit;
@@ -22,10 +12,7 @@ public:
 	static SDL_Window* window;
 	static SDL_Texture* texture;
 	static SDL_Surface* screenSurface;
-	static SDL_Surface* currentSurface;
 	static char* hairmanFilePath;
-	static char* arrowKeyFilePaths[];
-	static SDL_Surface* arrowKeySurfaces[];
 };
 
 
