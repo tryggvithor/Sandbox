@@ -4,11 +4,26 @@
 #include "Globals.h"
 
 
+struct Color
+{
+	Uint8 r, g, b, a;
+};
+
+struct Position
+{
+	int x, y;
+};
+
+
 bool init();
 bool loadMedia();
 void close();
 SDL_Texture* loadTexture(char* filePath);
 SDL_Surface* loadSurface(char* filePath);
+void renderFillRect(SDL_Renderer* renderer, Color color, SDL_Rect rect);
+void renderOutlineRect(SDL_Renderer* renderer, Color color, SDL_Rect rect);
+void drawHorizontalLine(SDL_Renderer* renderer, Color color, Position pos1, Position pos2);
+void drawVerticalDottedLine(SDL_Renderer* renderer, Color color, Position pos1, Position pos2, int interval);
 
 
 
@@ -27,6 +42,22 @@ int main(int argc, char* args[])
 
 	SDL_Event e;
 
+	//Temporary things
+	SDL_Rect fillRect = {Globals::screenWidth / 4, Globals::screenHeight / 4, Globals::screenWidth / 2, Globals::screenHeight / 2};
+	Color color_red = {0xff, 0x00, 0x00, 0xff};
+
+	SDL_Rect outlineRect = {Globals::screenWidth / 6, Globals::screenHeight / 6, Globals::screenWidth * 2 / 3, Globals::screenHeight * 2 / 3};
+	Color color_green = {0x00, 0xff, 0x00, 0xff};
+
+	Position pos_hori1 = {0, Globals::screenHeight / 2};
+	Position pos_hori2 = {Globals::screenWidth, Globals::screenHeight / 2};
+	Color color_blue = {0x00, 0x00, 0xff, 0xff};
+
+	Position pos_vert1 = {Globals::screenWidth / 2, 0};
+	Position pos_vert2 = {Globals::screenWidth, Globals::screenHeight};
+	Color color_yellow = {0xff, 0xff, 0x00, 0xff};
+
+
 	while (!Globals::hasQuit)
 	{
 		while (SDL_PollEvent(&e) != 0)
@@ -41,9 +72,13 @@ int main(int argc, char* args[])
 			}
 		}
 
+		SDL_SetRenderDrawColor(Globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(Globals::renderer);
 
-		SDL_RenderCopy(Globals::renderer, Globals::texture, NULL, NULL);
+		renderFillRect(Globals::renderer, color_red, fillRect);
+		renderOutlineRect(Globals::renderer, color_green, outlineRect);
+		drawHorizontalLine(Globals::renderer, color_blue, pos_hori1, pos_hori2);
+		drawVerticalDottedLine(Globals::renderer, color_yellow, pos_vert1, pos_vert2, 4);
 
 		SDL_RenderPresent(Globals::renderer);
 	}
@@ -82,7 +117,6 @@ bool init()
 	}
 
 	Globals::screenSurface = SDL_GetWindowSurface(Globals::window);
-	SDL_SetRenderDrawColor(Globals::renderer, 0xff, 0xff, 0xff, 0xff);
 
 	return true;
 }
@@ -156,6 +190,34 @@ SDL_Surface* loadSurface(char* filePath)
 	return optimizedSurface;
 }
 
+void renderFillRect(SDL_Renderer* renderer, Color color, SDL_Rect rect)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderFillRect(renderer, &rect);
+}
+
+void renderOutlineRect(SDL_Renderer* renderer, Color color, SDL_Rect rect)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderDrawRect(renderer, &rect);
+}
+
+void drawHorizontalLine(SDL_Renderer* renderer, Color color, Position pos1, Position pos2)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderDrawLine(renderer, pos1.x, pos1.y, pos2.x, pos2.y);
+}
+
+void drawVerticalDottedLine(SDL_Renderer* renderer, Color color, Position pos1, Position pos2, int interval)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	for (int i = pos1.y; i < pos2.y; i+=interval)
+	{
+		SDL_RenderDrawPoint(renderer, pos1.x, i);
+	}
+}
+
+
 void close()
 {
 	//Textures
@@ -172,3 +234,4 @@ void close()
 	IMG_Quit();
 	SDL_Quit();
 }
+
