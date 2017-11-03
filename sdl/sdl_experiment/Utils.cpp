@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include "Utils.h"
 
+//Primitives
 void Utils::renderFillRect(SDL_Renderer* renderer, Utils::Color color, SDL_Rect rect)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
@@ -26,4 +27,16 @@ void Utils::drawVerticalDottedLine(SDL_Renderer* renderer, Utils::Color color, U
 	{
 		SDL_RenderDrawPoint(renderer, pos1.x, i);
 	}
+}
+
+//Rendering util functions
+void Utils::renderInViewport(SDL_Renderer* renderer, SDL_Texture* texture, SDL_Rect* viewportRect)
+{
+	SDL_Rect oldViewport;
+	SDL_RenderGetViewport(renderer, &oldViewport);
+
+	SDL_RenderSetViewport(renderer, viewportRect);
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+
+	SDL_RenderSetViewport(renderer, &oldViewport);
 }

@@ -49,12 +49,17 @@ int main(int argc, char* args[])
 		SDL_SetRenderDrawColor(Globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(Globals::renderer);
 
+
+
 		SDL_RenderPresent(Globals::renderer);
 	}
 
 	close();
 	return 0;
 }
+
+
+
 
 bool init()
 {
