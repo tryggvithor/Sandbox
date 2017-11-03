@@ -1,8 +1,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <stdio.h>
-#include "Globals.h"
-#include "Utils.h"
+#include "globals.h"
+#include "utils.h"
 
 
 bool init();
