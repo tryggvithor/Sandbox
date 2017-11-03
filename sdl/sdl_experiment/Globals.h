@@ -2,17 +2,16 @@
 #define GLOBALS_H
 
 
-class Globals
+namespace globals
 {
-public:
-	static int screenWidth;
-	static int screenHeight;
-	static bool hasQuit;
-	static SDL_Renderer* renderer;
-	static SDL_Window* window;
-	static SDL_Texture* texture;
-	static SDL_Surface* screenSurface;
-	static char* hairmanFilePath;
+	int screenWidth = 1280;
+	int screenHeight = 729;
+	bool hasQuit = false;
+	SDL_Renderer* renderer = NULL;
+	SDL_Window* window = NULL;
+	SDL_Texture* texture = NULL;
+	SDL_Surface* screenSurface = NULL;
+	char* hairmanFilePath = "images/hairman.png";
 };
 
 

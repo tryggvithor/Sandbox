@@ -5,8 +5,6 @@
 #include "Utils.h"
 
 
-
-
 bool init();
 bool loadMedia();
 void close();
@@ -32,13 +30,13 @@ int main(int argc, char* args[])
 	SDL_Event e;
 
 
-	while (!Globals::hasQuit)
+	while (!globals::hasQuit)
 	{
 		while (SDL_PollEvent(&e) != 0)
 		{
 			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
 			{
-				Globals::hasQuit = true;
+				globals::hasQuit = true;
 			}
 			if (e.type == SDL_KEYDOWN)
 			{
@@ -46,12 +44,12 @@ int main(int argc, char* args[])
 			}
 		}
 
-		SDL_SetRenderDrawColor(Globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-		SDL_RenderClear(Globals::renderer);
+		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+		SDL_RenderClear(globals::renderer);
 
-
-
-		SDL_RenderPresent(Globals::renderer);
+		SDL_RenderCopy(globals::renderer, globals::texture, NULL, NULL);
+	
+		SDL_RenderPresent(globals::renderer);
 	}
 
 	close();
@@ -76,31 +74,31 @@ bool init()
 		return false;
 	}
 
-	Globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Globals::screenWidth, Globals::screenHeight, SDL_WINDOW_SHOWN);
-	if (Globals::window == NULL)
+	globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, globals::screenWidth, globals::screenHeight, SDL_WINDOW_SHOWN);
+	if (globals::window == NULL)
 	{
 		printf("SDL_CreateWindow failed, error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	Globals::renderer = SDL_CreateRenderer(Globals::window, -1, SDL_RENDERER_ACCELERATED);
-	if (Globals::renderer == NULL)
+	globals::renderer = SDL_CreateRenderer(globals::window, -1, SDL_RENDERER_ACCELERATED);
+	if (globals::renderer == NULL)
 	{
 		printf("SDL_CreateRenderer failed, error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	Globals::screenSurface = SDL_GetWindowSurface(Globals::window);
+	globals::screenSurface = SDL_GetWindowSurface(globals::window);
 
 	return true;
 }
 
 bool loadMedia()
 {
-	Globals::texture = loadTexture(Globals::hairmanFilePath);
-	if (Globals::texture == NULL)
+	globals::texture = loadTexture(globals::hairmanFilePath);
+	if (globals::texture == NULL)
 	{
-		printf("Failed to load texture image %s\n", Globals::hairmanFilePath);
+		printf("Failed to load texture image %s\n", globals::hairmanFilePath);
 		return false;
 	}
 
@@ -109,7 +107,7 @@ bool loadMedia()
 
 SDL_Texture* loadTexture(char* filePath)
 {
-	if (Globals::renderer == NULL)
+	if (globals::renderer == NULL)
 	{
 		printf("loadTexture() failed for %s, global renderer was NULL\n", filePath);
 		return NULL;
@@ -125,7 +123,7 @@ SDL_Texture* loadTexture(char* filePath)
 	}
 
 	//Create a texture from surface pixels
-	newTexture = SDL_CreateTextureFromSurface(Globals::renderer, loadedSurface);
+	newTexture = SDL_CreateTextureFromSurface(globals::renderer, loadedSurface);
 	if (newTexture == NULL)
 	{
 		printf("Failed to create texture from %s, error: %s\n", filePath, SDL_GetError());
@@ -138,7 +136,7 @@ SDL_Texture* loadTexture(char* filePath)
 
 SDL_Surface* loadSurface(char* filePath)
 {
-	if (Globals::screenSurface == NULL)
+	if (globals::screenSurface == NULL)
 	{
 		printf("loadSurface() failed for %s, global screenSurface was NULL\n", filePath);
 		return NULL;
@@ -154,7 +152,7 @@ SDL_Surface* loadSurface(char* filePath)
 	}
 
 	//Optimize the loaded image to the correct format
-	optimizedSurface = SDL_ConvertSurface(loadedSurface, Globals::screenSurface->format, NULL);
+	optimizedSurface = SDL_ConvertSurface(loadedSurface, globals::screenSurface->format, NULL);
 	if (optimizedSurface == NULL)
 	{
 		printf("Failed to optimize image %s, error: %s\n", filePath, SDL_GetError());
@@ -167,14 +165,14 @@ SDL_Surface* loadSurface(char* filePath)
 void close()
 {
 	//Textures
-	SDL_DestroyTexture(Globals::texture);
-	Globals::texture = NULL;
+	SDL_DestroyTexture(globals::texture);
+	globals::texture = NULL;
 
 	//Window
-	SDL_DestroyRenderer(Globals::renderer);
-	SDL_DestroyWindow(Globals::window);
-	Globals::renderer = NULL;
-	Globals::window = NULL;
+	SDL_DestroyRenderer(globals::renderer);
+	SDL_DestroyWindow(globals::window);
+	globals::renderer = NULL;
+	globals::window = NULL;
 
 	//SDL subsystems
 	IMG_Quit();
