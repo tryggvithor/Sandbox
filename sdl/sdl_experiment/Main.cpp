@@ -1,27 +1,28 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <stdio.h>
+#include "Texture.h"
 #include "globals.h"
 #include "utils.h"
 
 
 bool init();
-bool loadMedia();
+bool loadMedia(SDL_Renderer *renderer);
 void close();
-SDL_Texture* loadTexture(char* filePath);
-SDL_Surface* loadSurface(char* filePath);
+SDL_Texture *loadTexture(char *filePath);
+SDL_Surface *loadSurface(char *filePath);
 
 
 
 
-int main(int argc, char* args[])
+int main(int argc, char *args[])
 {
 	if (!init())
 	{
 		printf("Failed to initalize\n");
 		return 0;
 	}
-	if (!loadMedia())
+	if (!loadMedia(globals::renderer))
 	{
 		printf("Failed to load media\n");
 		return 0;
@@ -47,8 +48,9 @@ int main(int argc, char* args[])
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		SDL_RenderCopy(globals::renderer, globals::texture, NULL, NULL);
-	
+		globals::backgroundTexture->renderAt(globals::renderer, 0, 0);
+		globals::hairmanTexture->renderAt(globals::renderer, globals::backgroundTexture->width/4, globals::backgroundTexture->height/4);
+
 		SDL_RenderPresent(globals::renderer);
 	}
 
@@ -93,19 +95,24 @@ bool init()
 	return true;
 }
 
-bool loadMedia()
+bool loadMedia(SDL_Renderer *renderer)
 {
-	globals::texture = loadTexture(globals::hairmanFilePath);
-	if (globals::texture == NULL)
+	if (!globals::hairmanTexture->loadFromFile(renderer, globals::hairmanPath))
 	{
-		printf("Failed to load texture image %s\n", globals::hairmanFilePath);
+		printf("Failed to load texture %s\n", globals::hairmanPath);
+		return false;
+	}
+
+	if (!globals::backgroundTexture->loadFromFile(renderer, globals::backgroundPath))
+	{
+		printf("Failed to load texture %s\n", globals::backgroundPath);
 		return false;
 	}
 
 	return true;
 }
 
-SDL_Texture* loadTexture(char* filePath)
+SDL_Texture* loadTexture(char *filePath)
 {
 	if (globals::renderer == NULL)
 	{
@@ -115,7 +122,7 @@ SDL_Texture* loadTexture(char* filePath)
 	SDL_Texture* newTexture = NULL;
 
 	//Load the image
-	SDL_Surface* loadedSurface = IMG_Load(filePath);
+	SDL_Surface *loadedSurface = IMG_Load(filePath);
 	if (loadedSurface == NULL)
 	{
 		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
@@ -134,17 +141,17 @@ SDL_Texture* loadTexture(char* filePath)
 	return newTexture;
 }
 
-SDL_Surface* loadSurface(char* filePath)
+SDL_Surface *loadSurface(char *filePath)
 {
 	if (globals::screenSurface == NULL)
 	{
 		printf("loadSurface() failed for %s, global screenSurface was NULL\n", filePath);
 		return NULL;
 	}
-	SDL_Surface* optimizedSurface = NULL;
+	SDL_Surface *optimizedSurface = NULL;
 
 	//Load the image
-	SDL_Surface* loadedSurface = IMG_Load(filePath);
+	SDL_Surface *loadedSurface = IMG_Load(filePath);
 	if (loadedSurface == NULL)
 	{
 		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
@@ -165,8 +172,8 @@ SDL_Surface* loadSurface(char* filePath)
 void close()
 {
 	//Textures
-	SDL_DestroyTexture(globals::texture);
-	globals::texture = NULL;
+	delete globals::hairmanTexture;
+	delete globals::backgroundTexture;
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
