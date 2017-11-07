@@ -2,8 +2,8 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include "Texture.h"
-#include "globals2.h"
-#include "utils2.h"
+#include "globals.h"
+#include "utils.h"
 
 
 bool init(int screenWidth, int screenHeight);

@@ -2,7 +2,7 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include "Texture.h"
-#include "utils2.h"
+#include "utils.h"
 
 Texture::Texture()
 {

@@ -2,7 +2,7 @@
 #define TEXTURE_H
 
 #include <SDL.h>
-#include "utils2.h"
+#include "utils.h"
 
 
 class Texture

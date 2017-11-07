@@ -132,17 +132,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main2.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="globals2.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="Texture.h">
       <SubType>
       </SubType>
     </ClInclude>
-    <ClInclude Include="utils2.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
