@@ -2,6 +2,7 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include "Texture.h"
+#include "utils2.h"
 
 Texture::Texture()
 {
@@ -15,7 +16,7 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(SDL_Renderer *renderer, char *path)
+bool Texture::loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor, char *path)
 {
 	free();
 
@@ -34,7 +35,7 @@ bool Texture::loadFromFile(SDL_Renderer *renderer, char *path)
 		return false;
 	}
 
-	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0x00, 0xff, 0xff));
+	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, transparentColor.r, transparentColor.g, transparentColor.b));
 	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 	if (newTexture == NULL)
 	{
@@ -57,10 +58,16 @@ bool Texture::loadFromFile(SDL_Renderer *renderer, char *path)
 	return texture != NULL;
 }
 
-void Texture::renderAt(SDL_Renderer *renderer, int x, int y)
+void Texture::renderAt(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip)
 {
 	SDL_Rect renderQuad = {x, y, width, height};
-	SDL_RenderCopy(renderer, texture, NULL, &renderQuad);
+	if (clip != NULL)
+	{
+		renderQuad.w = clip->w;
+		renderQuad.h = clip->h;
+	}
+
+	SDL_RenderCopy(renderer, texture, clip, &renderQuad);
 }
 
 void Texture::free()
