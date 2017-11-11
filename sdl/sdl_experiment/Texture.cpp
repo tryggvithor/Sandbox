@@ -58,10 +58,22 @@ bool Texture::loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor
 	return texture != NULL;
 }
 
+
 void Texture::setColor(utils::Color color)
 {
 	SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
 }
+
+void Texture::setBlendMode(SDL_BlendMode blendMode)
+{
+	SDL_SetTextureBlendMode(texture, blendMode);
+}
+
+void Texture::setAlpha(Uint8 alpha)
+{
+	SDL_SetTextureAlphaMod(texture, alpha);
+}
+
 
 void Texture::renderAt(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip)
 {

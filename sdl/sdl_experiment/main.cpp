@@ -28,7 +28,8 @@ int main(int argc, char *args[])
 
 	SDL_Event e;
 
-	utils::Color colorMod = {255,255,255,255};
+
+	Uint8 alphaMod = 255;
 
 	while (!globals::hasQuit)
 	{
@@ -42,14 +43,20 @@ int main(int argc, char *args[])
 			{
 				switch (e.key.keysym.sym)
 				{
-				case SDLK_q: colorMod.r += 32; break;
-				case SDLK_a: colorMod.r -= 32; break;
-
-				case SDLK_w: colorMod.g += 32; break;
-				case SDLK_s: colorMod.g -= 32; break;
-				
-				case SDLK_e: colorMod.b += 32; break;
-				case SDLK_d: colorMod.b -= 32; break;
+				case SDLK_w: 
+					if (alphaMod + 32 > 255)
+					{
+						alphaMod = 255;
+					}
+					else alphaMod += 32;
+					break;
+				case SDLK_s: 
+					if (alphaMod - 32 < 0)
+					{
+						alphaMod = 0;
+					}
+					else alphaMod -= 32;
+					break;
 				}
 			}
 		}
@@ -57,8 +64,10 @@ int main(int argc, char *args[])
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::texture->setColor(colorMod);
-		globals::texture->renderAt(globals::renderer, 0, 0);
+		globals::fadeinTexture->renderAt(globals::renderer, 0, 0);
+
+		globals::fadeoutTexture->setAlpha(alphaMod);
+		globals::fadeoutTexture->renderAt(globals::renderer, 0, 0);
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -107,11 +116,21 @@ bool init(int screenWidth, int screenHeight)
 bool loadMedia(SDL_Renderer *renderer)
 {
 	utils::Color transparentColor = {0x00, 0xff, 0xff, 0xff};
-	if (!globals::texture->loadFromFile(renderer, transparentColor, globals::texturePath))
+
+
+	if (!globals::fadeinTexture->loadFromFile(renderer, transparentColor, globals::fadeinPath))
 	{
-		printf("Failed to load texture %s\n", globals::texturePath);
+		printf("Failed to load texture %s\n", globals::fadeinPath);
 		return false;
 	}
+
+	if (!globals::fadeoutTexture->loadFromFile(renderer, transparentColor, globals::fadeoutPath))
+	{
+		printf("Failed to load texture %s\n", globals::fadeoutPath);
+		return false;
+	}
+
+	globals::fadeoutTexture->setBlendMode(SDL_BLENDMODE_BLEND);
 
 	return true;
 }
@@ -120,7 +139,8 @@ bool loadMedia(SDL_Renderer *renderer)
 void close()
 {
 	//Textures
-	delete globals::texture;
+	delete globals::fadeinTexture;
+	delete globals::fadeoutTexture;
 
 
 	//Window

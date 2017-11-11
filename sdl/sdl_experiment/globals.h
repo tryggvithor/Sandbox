@@ -12,8 +12,10 @@ namespace globals
 	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
 
-	Texture *texture = new Texture();
-	char *texturePath = "images/hairmansprites.png";
+	Texture *fadeinTexture = new Texture();
+	Texture *fadeoutTexture = new Texture();
+	char *fadeinPath = "images/hairman_fadein.png";
+	char *fadeoutPath = "images/hairman_fadeout.png";
 };
 
 #endif // !GLOBALS_H
