@@ -12,14 +12,8 @@ namespace globals
 	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
 
-	Texture *spriteSheet = new Texture();
-	char *spriteSheetPath = "images/hairmansprites_transparent.png";
-	SDL_Rect spriteClips[4] = {
-		{  0,  0,200,200},
-		{200,  0,200,200},
-		{  0,200,200,200},
-		{200,200,200,200}
-	};
+	Texture *texture = new Texture();
+	char *texturePath = "images/hairmansprites.png";
 };
 
 #endif // !GLOBALS_H

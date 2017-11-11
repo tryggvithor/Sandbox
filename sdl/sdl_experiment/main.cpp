@@ -28,6 +28,7 @@ int main(int argc, char *args[])
 
 	SDL_Event e;
 
+	utils::Color colorMod = {255,255,255,255};
 
 	while (!globals::hasQuit)
 	{
@@ -39,17 +40,25 @@ int main(int argc, char *args[])
 			}
 			if (e.type == SDL_KEYDOWN)
 			{
+				switch (e.key.keysym.sym)
+				{
+				case SDLK_q: colorMod.r += 32; break;
+				case SDLK_a: colorMod.r -= 32; break;
+
+				case SDLK_w: colorMod.g += 32; break;
+				case SDLK_s: colorMod.g -= 32; break;
 				
+				case SDLK_e: colorMod.b += 32; break;
+				case SDLK_d: colorMod.b -= 32; break;
+				}
 			}
 		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::spriteSheet->renderAt(globals::renderer, 0, 0, &globals::spriteClips[0]);
-		globals::spriteSheet->renderAt(globals::renderer, globals::screenWidth - globals::spriteClips[1].w, 0, &globals::spriteClips[1]);
-		globals::spriteSheet->renderAt(globals::renderer, 0, globals::screenHeight - globals::spriteClips[2].h, &globals::spriteClips[2]);
-		globals::spriteSheet->renderAt(globals::renderer, globals::screenWidth - globals::spriteClips[3].w, globals::screenHeight - globals::spriteClips[3].h, &globals::spriteClips[3]);
+		globals::texture->setColor(colorMod);
+		globals::texture->renderAt(globals::renderer, 0, 0);
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -98,9 +107,9 @@ bool init(int screenWidth, int screenHeight)
 bool loadMedia(SDL_Renderer *renderer)
 {
 	utils::Color transparentColor = {0x00, 0xff, 0xff, 0xff};
-	if (!globals::spriteSheet->loadFromFile(renderer, transparentColor, globals::spriteSheetPath))
+	if (!globals::texture->loadFromFile(renderer, transparentColor, globals::texturePath))
 	{
-		printf("Failed to load texture %s\n", globals::spriteSheetPath);
+		printf("Failed to load texture %s\n", globals::texturePath);
 		return false;
 	}
 
@@ -111,7 +120,7 @@ bool loadMedia(SDL_Renderer *renderer)
 void close()
 {
 	//Textures
-	delete globals::spriteSheet;
+	delete globals::texture;
 
 
 	//Window

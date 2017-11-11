@@ -14,6 +14,7 @@ public:
 	~Texture();
 
 	bool loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor, char *path);
+	void setColor(utils::Color color);
 	void renderAt(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip = NULL);
 	void free();
 

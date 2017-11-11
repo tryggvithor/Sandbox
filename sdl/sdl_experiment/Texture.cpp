@@ -58,6 +58,11 @@ bool Texture::loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor
 	return texture != NULL;
 }
 
+void Texture::setColor(utils::Color color)
+{
+	SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+}
+
 void Texture::renderAt(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip)
 {
 	SDL_Rect renderQuad = {x, y, width, height};
