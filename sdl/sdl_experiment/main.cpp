@@ -2,6 +2,7 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include "Texture.h"
+
 #include "globals.h"
 #include "utils.h"
 
@@ -26,13 +27,22 @@ int main(int argc, char *args[])
 		return 0;
 	}
 
-	SDL_Event e;
+	Uint64 NOW = SDL_GetPerformanceCounter();
+	Uint64 LAST = 0;
+	double deltaTime = 0;
 
+	SDL_Event e;
+	int currentFrame = 0;
+	double frameTimer = 0.002;
 
 	Uint8 alphaMod = 255;
 
 	while (!globals::hasQuit)
 	{
+		LAST = NOW;
+		NOW = SDL_GetPerformanceCounter();
+		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+
 		while (SDL_PollEvent(&e) != 0)
 		{
 			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
@@ -43,33 +53,37 @@ int main(int argc, char *args[])
 			{
 				switch (e.key.keysym.sym)
 				{
-				case SDLK_w: 
-					if (alphaMod + 32 > 255)
-					{
-						alphaMod = 255;
-					}
-					else alphaMod += 32;
+				case SDLK_0:
+					printf("nice");
 					break;
-				case SDLK_s: 
-					if (alphaMod - 32 < 0)
-					{
-						alphaMod = 0;
-					}
-					else alphaMod -= 32;
-					break;
+				default:
+					printf("not really nice");
 				}
 			}
+		}
+
+		if (frameTimer > 0)
+		{
+			frameTimer -= deltaTime * 0.001;
+			continue;
 		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::fadeinTexture->renderAt(globals::renderer, 0, 0);
+		SDL_Rect *currentClip = &globals::spriteClips[currentFrame];
 
-		globals::fadeoutTexture->setAlpha(alphaMod);
-		globals::fadeoutTexture->renderAt(globals::renderer, 0, 0);
+		globals::colorAnimationTexture->renderAt(globals::renderer, 0, 0, currentClip);
 
 		SDL_RenderPresent(globals::renderer);
+
+		currentFrame++;
+		if (currentFrame >= globals::colorAnimationFrames)
+		{
+			currentFrame = 0;
+		}
+
+		frameTimer = 0.002;
 	}
 
 	close();
@@ -101,7 +115,7 @@ bool init(int screenWidth, int screenHeight)
 		return false;
 	}
 
-	globals::renderer = SDL_CreateRenderer(globals::window, -1, SDL_RENDERER_ACCELERATED);
+	globals::renderer = SDL_CreateRenderer(globals::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (globals::renderer == NULL)
 	{
 		printf("SDL_CreateRenderer failed, error: %s\n", SDL_GetError());
@@ -118,19 +132,19 @@ bool loadMedia(SDL_Renderer *renderer)
 	utils::Color transparentColor = {0x00, 0xff, 0xff, 0xff};
 
 
-	if (!globals::fadeinTexture->loadFromFile(renderer, transparentColor, globals::fadeinPath))
+	if (!globals::colorAnimationTexture->loadFromFile(renderer, transparentColor, globals::colorAnimationPath))
 	{
-		printf("Failed to load texture %s\n", globals::fadeinPath);
+		printf("Failed to load texture %s\n", globals::colorAnimationPath);
 		return false;
 	}
 
-	if (!globals::fadeoutTexture->loadFromFile(renderer, transparentColor, globals::fadeoutPath))
+	for (int i = 0; i < globals::colorAnimationFrames; i++)
 	{
-		printf("Failed to load texture %s\n", globals::fadeoutPath);
-		return false;
+		globals::spriteClips[i].x = (i % 4) * 40;
+		globals::spriteClips[i].y = (i / 4) * 40;
+		globals::spriteClips[i].w = 40;
+		globals::spriteClips[i].h = 40;
 	}
-
-	globals::fadeoutTexture->setBlendMode(SDL_BLENDMODE_BLEND);
 
 	return true;
 }
@@ -139,9 +153,7 @@ bool loadMedia(SDL_Renderer *renderer)
 void close()
 {
 	//Textures
-	delete globals::fadeinTexture;
-	delete globals::fadeoutTexture;
-
+	delete globals::colorAnimationTexture;
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);

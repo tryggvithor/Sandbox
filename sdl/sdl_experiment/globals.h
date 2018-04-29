@@ -12,10 +12,10 @@ namespace globals
 	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
 
-	Texture *fadeinTexture = new Texture();
-	Texture *fadeoutTexture = new Texture();
-	char *fadeinPath = "images/hairman_fadein.png";
-	char *fadeoutPath = "images/hairman_fadeout.png";
+	const int colorAnimationFrames = 16;
+	SDL_Rect spriteClips[colorAnimationFrames];
+	Texture *colorAnimationTexture = new Texture();
+	char *colorAnimationPath = "images/color_animation.png";
 };
 
 #endif // !GLOBALS_H
