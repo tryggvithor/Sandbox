@@ -51,50 +51,50 @@ bool Texture::loadFromFile(utils::Color transparentColor, char *path)
 		return false;
 	}
 
-	width = loadedSurface->w;
-	height = loadedSurface->h;
+	this->width = loadedSurface->w;
+	this->height = loadedSurface->h;
 	SDL_FreeSurface(loadedSurface);
 
-	texture = newTexture;
-	return texture != NULL;
+	this->texture = newTexture;
+	return this->texture != NULL;
 }
 
 
 void Texture::setColor(utils::Color color)
 {
-	SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+	SDL_SetTextureColorMod(this->texture, color.r, color.g, color.b);
 }
 
 void Texture::setBlendMode(SDL_BlendMode blendMode)
 {
-	SDL_SetTextureBlendMode(texture, blendMode);
+	SDL_SetTextureBlendMode(this->texture, blendMode);
 }
 
 void Texture::setAlpha(Uint8 alpha)
 {
-	SDL_SetTextureAlphaMod(texture, alpha);
+	SDL_SetTextureAlphaMod(this->texture, alpha);
 }
 
 
 void Texture::renderAt(int x, int y, SDL_Rect *clip)
 {
-	SDL_Rect renderQuad = {x, y, width, height};
+	SDL_Rect renderQuad = {x, y, this->width, this->height};
 	if (clip != NULL)
 	{
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;
 	}
 
-	SDL_RenderCopy(renderer, texture, clip, &renderQuad);
+	SDL_RenderCopy(this->renderer, this->texture, clip, &renderQuad);
 }
 
 void Texture::free()
 {
-	if (texture != NULL)
+	if (this->texture != NULL)
 	{
-		SDL_DestroyTexture(texture);
-		texture = NULL;
-		width = 0;
-		height = 0;
+		SDL_DestroyTexture(this->texture);
+		this->texture = NULL;
+		this->width = 0;
+		this->height = 0;
 	}
 }

@@ -8,8 +8,6 @@
 class Texture
 {
 public:
-	int width, height;
-
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
@@ -25,6 +23,7 @@ public:
 private:
 	SDL_Renderer *renderer;
 	SDL_Texture *texture;
+	int width, height;
 };
 
 #endif // !TEXTURE_H

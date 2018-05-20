@@ -5,6 +5,7 @@
 
 namespace globals
 {
+	// Defaults
 	bool hasQuit = false;
 	int screenWidth = 1280;
 	int screenHeight = 720;
@@ -12,6 +13,7 @@ namespace globals
 	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
 
+	// Tutorial specific
 	const int colorAnimationFrames = 16;
 	SDL_Rect spriteClips[colorAnimationFrames];
 	Texture *colorAnimationTexture = NULL;
