@@ -13,11 +13,9 @@ namespace globals
 	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
 
-	// Tutorial specific
-	const int colorAnimationFrames = 16;
-	SDL_Rect spriteClips[colorAnimationFrames];
-	Texture *colorAnimationTexture = NULL;
-	char *colorAnimationPath = "images/color_animation.png";
+	// Experiment specific
+	Texture *texture = NULL;
+	char *texturePath = "images/hairman2.png";
 };
 
 #endif // !GLOBALS_H

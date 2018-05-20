@@ -8,6 +8,7 @@
 class Texture
 {
 public:
+	int width, height;
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
@@ -17,13 +18,12 @@ public:
 	void setBlendMode(SDL_BlendMode blendMode);
 	void setAlpha(Uint8 alpha);
 
-	void renderAt(int x, int y, SDL_Rect *clip = NULL);
+	void renderAt(int x, int y, SDL_Rect *clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void free();
 
 private:
 	SDL_Renderer *renderer;
 	SDL_Texture *texture;
-	int width, height;
 };
 
 #endif // !TEXTURE_H

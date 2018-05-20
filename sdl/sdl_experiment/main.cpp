@@ -19,21 +19,23 @@ int main(int argc, char *args[])
 	if (!init(globals::screenWidth, globals::screenHeight))
 	{
 		printf("Failed to initalize\n");
-		return 0;
+		return 1;
 	}
 	if (!loadMedia(globals::renderer))
 	{
 		printf("Failed to load media\n");
-		return 0;
+		return 1;
 	}
 
+	// Delta time
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
+	// Experiment specific stuff
 	SDL_Event e;
-	int currentFrame = 0;
-	double frameTimer = 0.002;
+	double angleDegrees = 0.0;
+	SDL_RendererFlip flipType = SDL_FLIP_NONE;
 
 	Uint8 alphaMod = 255;
 
@@ -53,37 +55,31 @@ int main(int argc, char *args[])
 			{
 				switch (e.key.keysym.sym)
 				{
-				case SDLK_0:
-					printf("nice");
+				case SDLK_a:
+					angleDegrees -= 30;
 					break;
-				default:
-					printf("not really nice");
+				case SDLK_d:
+					angleDegrees += 30;
+					break;
+				case SDLK_q:
+					flipType = SDL_FLIP_HORIZONTAL;
+					break;
+				case SDLK_w:
+					flipType = SDL_FLIP_NONE;
+					break;
+				case SDLK_e:
+					flipType = SDL_FLIP_VERTICAL;
+					break;
 				}
 			}
-		}
-
-		if (frameTimer > 0)
-		{
-			frameTimer -= deltaTime * 0.001;
-			continue;
 		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		SDL_Rect *currentClip = &globals::spriteClips[currentFrame];
-
-		globals::colorAnimationTexture->renderAt(0, 0, currentClip);
+		globals::texture->renderAt(0, 0, NULL, angleDegrees, NULL, flipType);
 
 		SDL_RenderPresent(globals::renderer);
-
-		currentFrame++;
-		if (currentFrame >= globals::colorAnimationFrames)
-		{
-			currentFrame = 0;
-		}
-
-		frameTimer = 0.002;
 	}
 
 	close();
@@ -123,7 +119,7 @@ bool init(int screenWidth, int screenHeight)
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
-	globals::colorAnimationTexture = new Texture(globals::renderer);
+	globals::texture = new Texture(globals::renderer);
 
 	return true;
 }
@@ -133,18 +129,10 @@ bool loadMedia(SDL_Renderer *renderer)
 	utils::Color transparentColor = {0x00, 0xff, 0xff, 0xff};
 
 
-	if (!globals::colorAnimationTexture->loadFromFile(transparentColor, globals::colorAnimationPath))
+	if (!globals::texture->loadFromFile(transparentColor, globals::texturePath))
 	{
-		printf("Failed to load texture %s\n", globals::colorAnimationPath);
+		printf("Failed to load texture %s\n", globals::texturePath);
 		return false;
-	}
-
-	for (int i = 0; i < globals::colorAnimationFrames; i++)
-	{
-		globals::spriteClips[i].x = (i % 4) * 40;
-		globals::spriteClips[i].y = (i / 4) * 40;
-		globals::spriteClips[i].w = 40;
-		globals::spriteClips[i].h = 40;
 	}
 
 	return true;
@@ -154,7 +142,7 @@ bool loadMedia(SDL_Renderer *renderer)
 void close()
 {
 	//Textures
-	delete globals::colorAnimationTexture;
+	delete globals::texture;
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
