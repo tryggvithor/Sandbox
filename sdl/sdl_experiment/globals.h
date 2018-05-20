@@ -14,7 +14,7 @@ namespace globals
 
 	const int colorAnimationFrames = 16;
 	SDL_Rect spriteClips[colorAnimationFrames];
-	Texture *colorAnimationTexture = new Texture();
+	Texture *colorAnimationTexture = NULL;
 	char *colorAnimationPath = "images/color_animation.png";
 };
 

@@ -73,7 +73,7 @@ int main(int argc, char *args[])
 
 		SDL_Rect *currentClip = &globals::spriteClips[currentFrame];
 
-		globals::colorAnimationTexture->renderAt(globals::renderer, 0, 0, currentClip);
+		globals::colorAnimationTexture->renderAt(0, 0, currentClip);
 
 		SDL_RenderPresent(globals::renderer);
 
@@ -123,6 +123,7 @@ bool init(int screenWidth, int screenHeight)
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
+	globals::colorAnimationTexture = new Texture(globals::renderer);
 
 	return true;
 }
@@ -132,7 +133,7 @@ bool loadMedia(SDL_Renderer *renderer)
 	utils::Color transparentColor = {0x00, 0xff, 0xff, 0xff};
 
 
-	if (!globals::colorAnimationTexture->loadFromFile(renderer, transparentColor, globals::colorAnimationPath))
+	if (!globals::colorAnimationTexture->loadFromFile(transparentColor, globals::colorAnimationPath))
 	{
 		printf("Failed to load texture %s\n", globals::colorAnimationPath);
 		return false;

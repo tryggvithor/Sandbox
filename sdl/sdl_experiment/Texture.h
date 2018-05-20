@@ -10,19 +10,20 @@ class Texture
 public:
 	int width, height;
 
-	Texture();
+	Texture(SDL_Renderer *renderer);
 	~Texture();
 
-	bool loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor, char *path);
+	bool loadFromFile(utils::Color transparentColor, char *path);
 	
 	void setColor(utils::Color color);
 	void setBlendMode(SDL_BlendMode blendMode);
 	void setAlpha(Uint8 alpha);
 
-	void renderAt(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip = NULL);
+	void renderAt(int x, int y, SDL_Rect *clip = NULL);
 	void free();
 
 private:
+	SDL_Renderer *renderer;
 	SDL_Texture *texture;
 };
 

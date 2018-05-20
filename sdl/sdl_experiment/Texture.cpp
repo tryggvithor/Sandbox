@@ -4,11 +4,12 @@
 #include "Texture.h"
 #include "utils.h"
 
-Texture::Texture()
+Texture::Texture(SDL_Renderer *renderer)
 {
-	texture = NULL;
-	width = 0;
-	height = 0;
+	this->renderer = renderer;
+	this->texture = NULL;
+	this->width = 0;
+	this->height = 0;
 }
 
 Texture::~Texture()
@@ -16,11 +17,11 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor, char *path)
+bool Texture::loadFromFile(utils::Color transparentColor, char *path)
 {
 	free();
 
-	if (renderer == NULL)
+	if (this->renderer == NULL)
 	{
 		printf("loadFromFile(%s) failed, renderer was NULL\n", path);
 		return false;
@@ -36,14 +37,14 @@ bool Texture::loadFromFile(SDL_Renderer *renderer, utils::Color transparentColor
 	}
 
 	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, transparentColor.r, transparentColor.g, transparentColor.b));
-	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+	newTexture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
 	if (newTexture == NULL)
 	{
 		return false;
 	}
 
 	//Create a texture from surface pixels
-	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+	newTexture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
 	if (newTexture == NULL)
 	{
 		printf("loadFromFile(%s) failed, error: %s\n", path, SDL_GetError());
@@ -75,7 +76,7 @@ void Texture::setAlpha(Uint8 alpha)
 }
 
 
-void Texture::renderAt(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip)
+void Texture::renderAt(int x, int y, SDL_Rect *clip)
 {
 	SDL_Rect renderQuad = {x, y, width, height};
 	if (clip != NULL)
