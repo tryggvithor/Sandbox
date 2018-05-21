@@ -1,5 +1,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <stdio.h>
 #include "Texture.h"
 
@@ -55,29 +57,50 @@ int main(int argc, char *args[])
 			{
 				switch (e.key.keysym.sym)
 				{
-				case SDLK_a:
-					printf("Nice");
+				case SDLK_1:
+					Mix_PlayChannel(-1, globals::SoundEffects.high, 0);
+					break;
+				case SDLK_2:
+					Mix_PlayChannel(-1, globals::SoundEffects.med, 0);
+					break;
+				case SDLK_3:
+					Mix_PlayChannel(-1, globals::SoundEffects.low, 0);
+					break;
+				case SDLK_4:
+					Mix_PlayChannel(-1, globals::SoundEffects.scratch, 0);
+					break;
+				case SDLK_9:
+					if (Mix_PlayingMusic() == 0)
+					{
+						Mix_PlayMusic(globals::music, -1);
+					}
+					else
+					{
+						if (Mix_PausedMusic() == 1)
+						{
+							Mix_ResumeMusic();
+						}
+						else
+						{
+							Mix_PauseMusic();
+						}
+					}
+					break;
+				case SDLK_0:
+					Mix_HaltMusic();
 					break;
 				default:
 					break;
 				}
 			}
 
-			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-			globals::ShouldRender.up = currentKeyStates[SDL_SCANCODE_UP];
-			globals::ShouldRender.down = currentKeyStates[SDL_SCANCODE_DOWN];
-			globals::ShouldRender.left = currentKeyStates[SDL_SCANCODE_LEFT];
-			globals::ShouldRender.right = currentKeyStates[SDL_SCANCODE_RIGHT];
+			//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::ArrowTextures.defaultTexture->renderAt(0, 0);
-		if (globals::ShouldRender.up) globals::ArrowTextures.upTexture->renderAt(0, 0);
-		if (globals::ShouldRender.down) globals::ArrowTextures.downTexture->renderAt(0, 0);
-		if (globals::ShouldRender.left) globals::ArrowTextures.leftTexture->renderAt(0, 0);
-		if (globals::ShouldRender.right) globals::ArrowTextures.rightTexture->renderAt(0, 0);
+		globals::texture->renderAt(0, 0);
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -91,24 +114,32 @@ int main(int argc, char *args[])
 
 bool init(int screenWidth, int screenHeight)
 {
+	bool succeeded = true;
+
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		printf("SDL_INIT failed, error: %s\n", SDL_GetError());
-		return false;
+		printf("SDL failed to initialize, error: %s\n", SDL_GetError());
+		succeeded = false;
 	}
 
 	int imgFlags = IMG_INIT_PNG;
 	if (!(IMG_Init(imgFlags) & imgFlags))
 	{
 		printf("SDL_image failed to initialize, error: %s\n", IMG_GetError());
-		return false;
+		succeeded = false;
+	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		printf("SDL_mixer failed to initialize, error: %s\n", Mix_GetError());
+		succeeded = false;
 	}
 	
 #ifdef _SDL_TTF_H
 	if (TTF_Init() == -1)
 	{
 		printf("SDL_ttf failed to initialize, error: %s\n", TTF_GetError());
-		return false;
+		succeeded = false;
 	}
 #endif
 
@@ -116,68 +147,96 @@ bool init(int screenWidth, int screenHeight)
 	if (globals::window == NULL)
 	{
 		printf("SDL_CreateWindow failed, error: %s\n", SDL_GetError());
-		return false;
+		succeeded = false;
 	}
 
 	globals::renderer = SDL_CreateRenderer(globals::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (globals::renderer == NULL)
 	{
 		printf("SDL_CreateRenderer failed, error: %s\n", SDL_GetError());
-		return false;
+		succeeded = false;
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
-	globals::ArrowTextures.upTexture = new Texture(globals::renderer);
-	globals::ArrowTextures.downTexture = new Texture(globals::renderer);
-	globals::ArrowTextures.leftTexture = new Texture(globals::renderer);
-	globals::ArrowTextures.rightTexture = new Texture(globals::renderer);
-	globals::ArrowTextures.defaultTexture = new Texture(globals::renderer);
-	
+	globals::texture = new Texture(globals::renderer);
 
-	return true;
+	return succeeded;
 }
 
 bool loadMedia(SDL_Renderer *renderer)
 {
-	SDL_Color transparentColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	if (!globals::ArrowTextures.upTexture->loadFromFile(globals::ArrowPaths.upPath, &transparentColor))
+	bool succeeded = true;
+
+	TTF_Font *font = TTF_OpenFont("fonts/ClassCoder.ttf", 28);
+	if (font == NULL)
 	{
-		printf("loadMedia failed, error: %s\n", SDL_GetError());
-		return false;
-	}
-	if (!globals::ArrowTextures.downTexture->loadFromFile(globals::ArrowPaths.downPath, &transparentColor))
-	{
-		printf("loadMedia failed, error: %s\n", SDL_GetError());
-		return false;
-	}
-	if (!globals::ArrowTextures.leftTexture->loadFromFile(globals::ArrowPaths.leftPath, &transparentColor))
-	{
-		printf("loadMedia failed, error: %s\n", SDL_GetError());
-		return false;
-	}
-	if (!globals::ArrowTextures.rightTexture->loadFromFile(globals::ArrowPaths.rightPath, &transparentColor))
-	{
-		printf("loadMedia failed, error: %s\n", SDL_GetError());
-		return false;
-	}
-	if (!globals::ArrowTextures.defaultTexture->loadFromFile(globals::ArrowPaths.defaultPath, &transparentColor))
-	{
-		printf("loadMedia failed, error: %s\n", SDL_GetError());
-		return false;
+		printf("loadMedia failed, error: %s\n", TTF_GetError());
+		succeeded = false;
 	}
 
-	return true;
+	if (!globals::texture->loadFromRenderedText("1,2,3,4 for sounds. 9 to play/pause music. 0 to stop music", font))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		succeeded = false;
+	}
+
+	globals::music = Mix_LoadMUS(globals::musicPath);
+	if (globals::music == NULL)
+	{
+		printf("loadMedia failed, error: %s\n", Mix_GetError());
+		succeeded = false;
+	}
+
+	globals::SoundEffects.scratch = Mix_LoadWAV(globals::SoundEffectPaths.scratch);
+	if (globals::SoundEffects.scratch == NULL)
+	{
+		printf("loadMedia scratch failed, error: %s\n", Mix_GetError());
+		succeeded = false;
+	}
+
+	globals::SoundEffects.high = Mix_LoadWAV(globals::SoundEffectPaths.high);
+	if (globals::SoundEffects.high == NULL)
+	{
+		printf("loadMedia high failed, error: %s\n", Mix_GetError());
+		succeeded = false;
+	}
+
+	globals::SoundEffects.med = Mix_LoadWAV(globals::SoundEffectPaths.med);
+	if (globals::SoundEffects.med == NULL)
+	{
+		printf("loadMedia med failed, error: %s\n", Mix_GetError());
+		succeeded = false;
+	}
+
+	globals::SoundEffects.low = Mix_LoadWAV(globals::SoundEffectPaths.low);
+	if (globals::SoundEffects.low == NULL)
+	{
+		printf("loadMedia low failed, error: %s\n", Mix_GetError());
+		succeeded = false;
+	}
+
+	return succeeded;
 }
 
 
 void close()
 {
 	//Textures
-	delete globals::ArrowTextures.upTexture;
-	delete globals::ArrowTextures.downTexture;
-	delete globals::ArrowTextures.leftTexture;
-	delete globals::ArrowTextures.rightTexture;
-	delete globals::ArrowTextures.defaultTexture;
+	delete globals::texture;
+
+	//Sounds
+	Mix_FreeChunk(globals::SoundEffects.scratch);
+	Mix_FreeChunk(globals::SoundEffects.high);
+	Mix_FreeChunk(globals::SoundEffects.med);
+	Mix_FreeChunk(globals::SoundEffects.low);
+	globals::SoundEffects.scratch = NULL;
+	globals::SoundEffects.high = NULL;
+	globals::SoundEffects.med = NULL;
+	globals::SoundEffects.low = NULL;
+
+	//Music
+	Mix_FreeMusic(globals::music);
+	globals::music = NULL;
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
@@ -190,6 +249,7 @@ void close()
 #ifdef _SDL_TTF_H
 	if (TTF_WasInit()) TTF_Quit();
 #endif
+	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }

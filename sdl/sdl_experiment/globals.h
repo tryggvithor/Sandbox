@@ -1,6 +1,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <SDL.h>
+#include <SDL_mixer.h>
 #include "Texture.h"
 #include "Button.h"
 
@@ -15,30 +17,23 @@ namespace globals
 	SDL_Surface *screenSurface = NULL;
 
 	//Experiment specific stuff
-	int totalTextures = 5;
-	struct Bools
+	Mix_Music *music = NULL;
+	char *musicPath = "sounds/beat.wav";
+	struct SoundEffects
 	{
-		bool up = false;
-		bool down = false;
-		bool left = false;
-		bool right = false;
-	} ShouldRender;
-	struct Textures
+		Mix_Chunk *scratch = NULL;
+		Mix_Chunk *high = NULL;
+		Mix_Chunk *med = NULL;
+		Mix_Chunk *low = NULL;
+	} SoundEffects;
+	struct SoundEffectPaths
 	{
-		Texture *upTexture = NULL;
-		Texture *downTexture = NULL;
-		Texture *leftTexture = NULL;
-		Texture *rightTexture = NULL;
-		Texture *defaultTexture = NULL;
-	} ArrowTextures;
-	struct TexturePaths
-	{
-		char *upPath = "images/up.png";
-		char *downPath = "images/down.png";
-		char *leftPath = "images/left.png";
-		char *rightPath = "images/right.png";
-		char *defaultPath = "images/default.png";
-	} ArrowPaths;
+		char *scratch = "sounds/scratch.wav";
+		char *high = "sounds/high.wav";
+		char *med = "sounds/med.wav";
+		char *low = "sounds/low.wav";
+	} SoundEffectPaths;
+	Texture *texture = NULL;
 };
 
 #endif // !GLOBALS_H
