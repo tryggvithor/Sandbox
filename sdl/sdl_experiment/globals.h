@@ -6,7 +6,7 @@
 
 namespace globals
 {
-	//Defaults
+	//Default stuff
 	bool hasQuit = false;
 	int screenWidth = 1280;
 	int screenHeight = 720;
@@ -14,15 +14,31 @@ namespace globals
 	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
 
-	//Experiment specific
-	const int BUTTON_WIDTH = 200;
-	const int BUTTON_HEIGHT = 200;
-	const int TOTAL_BUTTONS = 4;
-	Button *buttons[TOTAL_BUTTONS];
-
-	Texture *buttonTexture = NULL;
-	SDL_Rect buttonClips[Button::ButtonStates::COUNT];
-	char *texturePath = "images/hairmansprites_buttons.png";
+	//Experiment specific stuff
+	int totalTextures = 5;
+	struct Bools
+	{
+		bool up = false;
+		bool down = false;
+		bool left = false;
+		bool right = false;
+	} ShouldRender;
+	struct Textures
+	{
+		Texture *upTexture = NULL;
+		Texture *downTexture = NULL;
+		Texture *leftTexture = NULL;
+		Texture *rightTexture = NULL;
+		Texture *defaultTexture = NULL;
+	} ArrowTextures;
+	struct TexturePaths
+	{
+		char *upPath = "images/up.png";
+		char *downPath = "images/down.png";
+		char *leftPath = "images/left.png";
+		char *rightPath = "images/right.png";
+		char *defaultPath = "images/default.png";
+	} ArrowPaths;
 };
 
 #endif // !GLOBALS_H

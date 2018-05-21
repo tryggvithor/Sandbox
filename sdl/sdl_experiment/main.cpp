@@ -37,8 +37,6 @@ int main(int argc, char *args[])
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
-	//Experiment specific stuff
-	
 
 
 	while (!globals::hasQuit)
@@ -55,10 +53,6 @@ int main(int argc, char *args[])
 			}
 			if (e.type == SDL_KEYDOWN)
 			{
-				//Current problem with this approach:
-				//	More than one key at a time -> only the latest key gets handled and the rest is ignored
-				//Handle this differently in the future 
-				//	with an array of keys instead, SDL_GetKeyboardState(NULL)?
 				switch (e.key.keysym.sym)
 				{
 				case SDLK_a:
@@ -69,20 +63,21 @@ int main(int argc, char *args[])
 				}
 			}
 
-			//Handle button events
-			for (int i = 0; i < globals::TOTAL_BUTTONS; ++i)
-			{
-				globals::buttons[i]->handleEvent(&e);
-			}
+			const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+			globals::ShouldRender.up = currentKeyStates[SDL_SCANCODE_UP];
+			globals::ShouldRender.down = currentKeyStates[SDL_SCANCODE_DOWN];
+			globals::ShouldRender.left = currentKeyStates[SDL_SCANCODE_LEFT];
+			globals::ShouldRender.right = currentKeyStates[SDL_SCANCODE_RIGHT];
 		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		for (int i = 0; i < globals::TOTAL_BUTTONS; i++)
-		{
-			globals::buttons[i]->render();
-		}
+		globals::ArrowTextures.defaultTexture->renderAt(0, 0);
+		if (globals::ShouldRender.up) globals::ArrowTextures.upTexture->renderAt(0, 0);
+		if (globals::ShouldRender.down) globals::ArrowTextures.downTexture->renderAt(0, 0);
+		if (globals::ShouldRender.left) globals::ArrowTextures.leftTexture->renderAt(0, 0);
+		if (globals::ShouldRender.right) globals::ArrowTextures.rightTexture->renderAt(0, 0);
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -109,11 +104,13 @@ bool init(int screenWidth, int screenHeight)
 		return false;
 	}
 	
+#ifdef _SDL_TTF_H
 	if (TTF_Init() == -1)
 	{
 		printf("SDL_ttf failed to initialize, error: %s\n", TTF_GetError());
 		return false;
 	}
+#endif
 
 	globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN);
 	if (globals::window == NULL)
@@ -130,37 +127,45 @@ bool init(int screenWidth, int screenHeight)
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
-	globals::buttonTexture = new Texture(globals::renderer);
+	globals::ArrowTextures.upTexture = new Texture(globals::renderer);
+	globals::ArrowTextures.downTexture = new Texture(globals::renderer);
+	globals::ArrowTextures.leftTexture = new Texture(globals::renderer);
+	globals::ArrowTextures.rightTexture = new Texture(globals::renderer);
+	globals::ArrowTextures.defaultTexture = new Texture(globals::renderer);
+	
 
 	return true;
 }
 
 bool loadMedia(SDL_Renderer *renderer)
 {
-	if (!globals::buttonTexture->loadFromFile(globals::texturePath))
+	SDL_Color transparentColor = {0xFF, 0xFF, 0xFF, 0xFF};
+	if (!globals::ArrowTextures.upTexture->loadFromFile(globals::ArrowPaths.upPath, &transparentColor))
 	{
-		printf("lodaMedia failed, error: %s\n", SDL_GetError());
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+	if (!globals::ArrowTextures.downTexture->loadFromFile(globals::ArrowPaths.downPath, &transparentColor))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+	if (!globals::ArrowTextures.leftTexture->loadFromFile(globals::ArrowPaths.leftPath, &transparentColor))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+	if (!globals::ArrowTextures.rightTexture->loadFromFile(globals::ArrowPaths.rightPath, &transparentColor))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+	if (!globals::ArrowTextures.defaultTexture->loadFromFile(globals::ArrowPaths.defaultPath, &transparentColor))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		return false;
 	}
 
-	//Initialize clips
-	for (int i = 0; i < Button::ButtonStates::COUNT; i++)
-	{
-		//400x400 texture, 2x2
-		globals::buttonClips[i].x = (i % 2) * 200;
-		globals::buttonClips[i].y = (i / 2) * 200;
-		globals::buttonClips[i].w = 200;
-		globals::buttonClips[i].h = 200;
-	}
-
-	//Initalize buttons
-	for (int i = 0; i < globals::TOTAL_BUTTONS; i++)
-	{
-		globals::buttons[i] = new Button(globals::buttonTexture, globals::buttonClips, globals::BUTTON_WIDTH, globals::BUTTON_HEIGHT);
-		globals::buttons[i]->pos.x = (i % 2) * globals::buttons[i]->width;
-		globals::buttons[i]->pos.y = (i / 2) * globals::buttons[i]->height;
-	}
-	
 	return true;
 }
 
@@ -168,7 +173,11 @@ bool loadMedia(SDL_Renderer *renderer)
 void close()
 {
 	//Textures
-	delete globals::buttonTexture;
+	delete globals::ArrowTextures.upTexture;
+	delete globals::ArrowTextures.downTexture;
+	delete globals::ArrowTextures.leftTexture;
+	delete globals::ArrowTextures.rightTexture;
+	delete globals::ArrowTextures.defaultTexture;
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
@@ -178,7 +187,9 @@ void close()
 	globals::screenSurface = NULL;
 
 	//SDL subsystems
-	TTF_Quit();
+#ifdef _SDL_TTF_H
+	if (TTF_WasInit()) TTF_Quit();
+#endif
 	IMG_Quit();
 	SDL_Quit();
 }
