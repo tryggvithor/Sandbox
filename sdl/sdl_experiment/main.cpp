@@ -1,6 +1,5 @@
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_ttf.h>
 #include <stdio.h>
 #include "Texture.h"
 
@@ -39,9 +38,7 @@ int main(int argc, char *args[])
 	double deltaTime = 0;
 
 	//Experiment specific stuff
-	const int BUTTON_WIDTH = 300;
-	const int BUTTON_HEIGHT = 200;
-	const int TOTAL_BUTTONS = globals::MouseEvents::COUNT;
+	
 
 
 	while (!globals::hasQuit)
@@ -71,12 +68,21 @@ int main(int argc, char *args[])
 					break;
 				}
 			}
+
+			//Handle button events
+			for (int i = 0; i < globals::TOTAL_BUTTONS; ++i)
+			{
+				globals::buttons[i]->handleEvent(&e);
+			}
 		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::texture->renderAt(0, 0);
+		for (int i = 0; i < globals::TOTAL_BUTTONS; i++)
+		{
+			globals::buttons[i]->render();
+		}
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -124,27 +130,35 @@ bool init(int screenWidth, int screenHeight)
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
-	globals::texture = new Texture(globals::renderer);
+	globals::buttonTexture = new Texture(globals::renderer);
 
 	return true;
 }
 
 bool loadMedia(SDL_Renderer *renderer)
 {
-	SDL_Color transparentColor = {0x00, 0xff, 0xff, 0xff};
-
-	globals::font = TTF_OpenFont(globals::fontPath, 28);
-	if (globals::font == NULL)
-	{
-		printf("loadMedia failed, error: %s\n", TTF_GetError());
-		return false;
-	}
-	
-	SDL_Color textColor = {0,0,0};
-	if (!globals::texture->loadFromRenderedText("The quickest of the brownest foxes jumps over the laziest of all dogs.", globals::font, textColor))
+	if (!globals::buttonTexture->loadFromFile(globals::texturePath))
 	{
 		printf("lodaMedia failed, error: %s\n", SDL_GetError());
 		return false;
+	}
+
+	//Initialize clips
+	for (int i = 0; i < Button::ButtonStates::COUNT; i++)
+	{
+		//400x400 texture, 2x2
+		globals::buttonClips[i].x = (i % 2) * 200;
+		globals::buttonClips[i].y = (i / 2) * 200;
+		globals::buttonClips[i].w = 200;
+		globals::buttonClips[i].h = 200;
+	}
+
+	//Initalize buttons
+	for (int i = 0; i < globals::TOTAL_BUTTONS; i++)
+	{
+		globals::buttons[i] = new Button(globals::buttonTexture, globals::buttonClips, globals::BUTTON_WIDTH, globals::BUTTON_HEIGHT);
+		globals::buttons[i]->pos.x = (i % 2) * globals::buttons[i]->width;
+		globals::buttons[i]->pos.y = (i / 2) * globals::buttons[i]->height;
 	}
 	
 	return true;
@@ -154,11 +168,7 @@ bool loadMedia(SDL_Renderer *renderer)
 void close()
 {
 	//Textures
-	delete globals::texture;
-
-	//TTF
-	TTF_CloseFont(globals::font);
-	globals::font = NULL;
+	delete globals::buttonTexture;
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);

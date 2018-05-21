@@ -10,10 +10,11 @@ class Texture
 {
 public:
 	int width, height;
+
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
-	bool loadFromFile(char *path, SDL_Color transparentColor);
+	bool loadFromFile(char *path, SDL_Color *transparentColor = NULL);
 #ifdef _SDL_TTF_H
 	bool loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color);
 #endif

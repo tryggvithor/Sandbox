@@ -17,7 +17,7 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(char *path, SDL_Color transparentColor)
+bool Texture::loadFromFile(char *path, SDL_Color *transparentColor)
 {
 	free();
 
@@ -34,7 +34,10 @@ bool Texture::loadFromFile(char *path, SDL_Color transparentColor)
 		return false;
 	}
 
-	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, transparentColor.r, transparentColor.g, transparentColor.b));
+	if (transparentColor != NULL)
+	{
+		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, transparentColor->r, transparentColor->g, transparentColor->b));
+	}
 
 	this->texture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
 	if (this->texture == NULL)

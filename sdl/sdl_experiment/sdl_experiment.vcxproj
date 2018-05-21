@@ -132,11 +132,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="globals.h" />
     <ClInclude Include="Texture.h">
       <SubType>

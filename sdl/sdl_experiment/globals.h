@@ -1,8 +1,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <SDL_ttf.h>
 #include "Texture.h"
+#include "Button.h"
 
 namespace globals
 {
@@ -15,18 +15,14 @@ namespace globals
 	SDL_Surface *screenSurface = NULL;
 
 	//Experiment specific
-	enum MouseEvents
-	{
-		MOUSE_OUT = 0,
-		MOUSE_OVER_MOTION = 1,
-		MOUSE_DOWN = 2,
-		MOUSE_UP = 3,
-		COUNT = 4
-	};
+	const int BUTTON_WIDTH = 200;
+	const int BUTTON_HEIGHT = 200;
+	const int TOTAL_BUTTONS = 4;
+	Button *buttons[TOTAL_BUTTONS];
 
-	Texture *texture = NULL;
-	TTF_Font *font = NULL;
-	char *fontPath = "fonts/ClassCoder.ttf";
+	Texture *buttonTexture = NULL;
+	SDL_Rect buttonClips[Button::ButtonStates::COUNT];
+	char *texturePath = "images/hairmansprites_buttons.png";
 };
 
 #endif // !GLOBALS_H
