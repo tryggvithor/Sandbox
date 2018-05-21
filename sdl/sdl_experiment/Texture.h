@@ -16,7 +16,7 @@ public:
 
 	bool loadFromFile(char *path, SDL_Color *transparentColor = NULL);
 #ifdef _SDL_TTF_H
-	bool loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0x00});
+	bool loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0xFF});
 #endif
 
 	void setColor(SDL_Color color);
