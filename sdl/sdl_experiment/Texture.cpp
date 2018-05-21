@@ -1,8 +1,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include "Texture.h"
-#include "utils.h"
 
 Texture::Texture(SDL_Renderer *renderer)
 {
@@ -17,7 +17,7 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(utils::Color transparentColor, char *path)
+bool Texture::loadFromFile(SDL_Color transparentColor, char *path)
 {
 	free();
 
@@ -37,12 +37,6 @@ bool Texture::loadFromFile(utils::Color transparentColor, char *path)
 	}
 
 	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, transparentColor.r, transparentColor.g, transparentColor.b));
-	newTexture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
-	if (newTexture == NULL)
-	{
-		return false;
-	}
-
 	//Create a texture from surface pixels
 	newTexture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
 	if (newTexture == NULL)
@@ -59,8 +53,33 @@ bool Texture::loadFromFile(utils::Color transparentColor, char *path)
 	return this->texture != NULL;
 }
 
+bool Texture::loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color)
+{
+	free();
 
-void Texture::setColor(utils::Color color)
+	SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, color);
+	if (textSurface == NULL)
+	{
+		printf("loadFromRendereText(%s) failed, error: %s\n", text, TTF_GetError());
+		return false;
+	}
+
+	this->texture = SDL_CreateTextureFromSurface(this->renderer, textSurface);
+	if (this->texture == NULL)
+	{
+		printf("loadFromRendereText(%s) failed, error: %s\n", text, SDL_GetError());
+		return false;
+	}
+
+	this->width = textSurface->w;
+	this->height = textSurface->h;
+	SDL_FreeSurface(textSurface);
+
+	return true;
+}
+
+
+void Texture::setColor(SDL_Color color)
 {
 	SDL_SetTextureColorMod(this->texture, color.r, color.g, color.b);
 }

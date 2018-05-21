@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include "utils.h"
 
 
@@ -12,9 +13,10 @@ public:
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
-	bool loadFromFile(utils::Color transparentColor, char *path);
+	bool loadFromFile(SDL_Color transparentColor, char *path);
+	bool loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color);
 	
-	void setColor(utils::Color color);
+	void setColor(SDL_Color color);
 	void setBlendMode(SDL_BlendMode blendMode);
 	void setAlpha(Uint8 alpha);
 

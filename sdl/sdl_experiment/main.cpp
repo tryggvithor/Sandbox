@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include "Texture.h"
 
@@ -16,23 +17,25 @@ void close();
 
 int main(int argc, char *args[])
 {
+	printf("\n");
+
 	if (!init(globals::screenWidth, globals::screenHeight))
 	{
 		printf("Failed to initalize\n");
-		return 1;
+		return 0;
 	}
 	if (!loadMedia(globals::renderer))
 	{
 		printf("Failed to load media\n");
-		return 1;
+		return 0;
 	}
 
-	// Delta time
+	//Delta time
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
-	// Experiment specific stuff
+	//Experiment specific stuff
 	SDL_Event e;
 	double angleDegrees = 0.0;
 	SDL_RendererFlip flipType = SDL_FLIP_NONE;
@@ -53,22 +56,16 @@ int main(int argc, char *args[])
 			}
 			if (e.type == SDL_KEYDOWN)
 			{
+				//Current problem with this approach:
+				//	More than one key at a time -> only the latest key gets handled and the rest is ignored
+				//Handle this differently in the future 
+				//	with an array of keys instead, SDL_GetKeyboardState(NULL)?
 				switch (e.key.keysym.sym)
 				{
 				case SDLK_a:
-					angleDegrees -= 30;
+					printf("Nice");
 					break;
-				case SDLK_d:
-					angleDegrees += 30;
-					break;
-				case SDLK_q:
-					flipType = SDL_FLIP_HORIZONTAL;
-					break;
-				case SDLK_w:
-					flipType = SDL_FLIP_NONE;
-					break;
-				case SDLK_e:
-					flipType = SDL_FLIP_VERTICAL;
+				default:
 					break;
 				}
 			}
@@ -77,7 +74,7 @@ int main(int argc, char *args[])
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::texture->renderAt(0, 0, NULL, angleDegrees, NULL, flipType);
+		globals::texture->renderAt(0, 0);
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -103,6 +100,12 @@ bool init(int screenWidth, int screenHeight)
 		printf("SDL_image failed to initialize, error: %s\n", IMG_GetError());
 		return false;
 	}
+	
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf failed to initialize, error: %s\n", TTF_GetError());
+		return false;
+	}
 
 	globals::window = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN);
 	if (globals::window == NULL)
@@ -126,15 +129,22 @@ bool init(int screenWidth, int screenHeight)
 
 bool loadMedia(SDL_Renderer *renderer)
 {
-	utils::Color transparentColor = {0x00, 0xff, 0xff, 0xff};
+	SDL_Color transparentColor = {0x00, 0xff, 0xff, 0xff};
 
-
-	if (!globals::texture->loadFromFile(transparentColor, globals::texturePath))
+	globals::font = TTF_OpenFont(globals::fontPath, 28);
+	if (globals::font == NULL)
 	{
-		printf("Failed to load texture %s\n", globals::texturePath);
+		printf("loadMedia failed, error: %s\n", TTF_GetError());
 		return false;
 	}
-
+	
+	SDL_Color textColor = {0,0,0};
+	if (!globals::texture->loadFromRenderedText("The quickest of the brownest foxes jumps over the laziest of all dogs.", globals::font, textColor))
+	{
+		printf("lodaMedia failed, error: %s\n", SDL_GetError());
+		return false;
+	}
+	
 	return true;
 }
 
@@ -144,6 +154,10 @@ void close()
 	//Textures
 	delete globals::texture;
 
+	//TTF
+	TTF_CloseFont(globals::font);
+	globals::font = NULL;
+
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
 	SDL_DestroyWindow(globals::window);
@@ -151,8 +165,8 @@ void close()
 	globals::window = NULL;
 	globals::screenSurface = NULL;
 
-
 	//SDL subsystems
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }

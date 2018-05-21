@@ -8,18 +8,14 @@
 
 namespace utils
 {
-	struct Color { Uint8 r, g, b, a; };
-	struct Position { int x, y; };
-
-
 	//Primitives
-	void renderFillRect(SDL_Renderer *renderer, Color color, SDL_Rect rect);
-	void renderOutlineRect(SDL_Renderer *renderer, Color color, SDL_Rect rect);
-	void drawHorizontalLine(SDL_Renderer *renderer, Color color, Position pos1, Position pos2);
-	void drawVerticalDottedLine(SDL_Renderer *renderer, Color color, Position pos1, Position pos2, int interval);
+	void renderFillRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect);
+	void renderOutlineRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect);
+	void renderHorizontalLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2);
+	void renderVerticalDottedLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2, int interval);
 
 
-	//Rendering functions
+	//Specific rendering functions
 	void renderInViewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect);
 
 
