@@ -30,17 +30,19 @@ int main(int argc, char *args[])
 		return 0;
 	}
 
+	SDL_Event e;
+	Uint8 alphaMod = 255;
+
 	//Delta time
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
 	//Experiment specific stuff
-	SDL_Event e;
-	double angleDegrees = 0.0;
-	SDL_RendererFlip flipType = SDL_FLIP_NONE;
+	const int BUTTON_WIDTH = 300;
+	const int BUTTON_HEIGHT = 200;
+	const int TOTAL_BUTTONS = globals::MouseEvents::COUNT;
 
-	Uint8 alphaMod = 255;
 
 	while (!globals::hasQuit)
 	{

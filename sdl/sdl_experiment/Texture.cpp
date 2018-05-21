@@ -17,7 +17,7 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(SDL_Color transparentColor, char *path)
+bool Texture::loadFromFile(char *path, SDL_Color transparentColor)
 {
 	free();
 
@@ -26,9 +26,7 @@ bool Texture::loadFromFile(SDL_Color transparentColor, char *path)
 		printf("loadFromFile(%s) failed, renderer was NULL\n", path);
 		return false;
 	}
-	SDL_Texture *newTexture = NULL;
 
-	//Load the image
 	SDL_Surface *loadedSurface = IMG_Load(path);
 	if (loadedSurface == NULL)
 	{
@@ -37,9 +35,9 @@ bool Texture::loadFromFile(SDL_Color transparentColor, char *path)
 	}
 
 	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, transparentColor.r, transparentColor.g, transparentColor.b));
-	//Create a texture from surface pixels
-	newTexture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
-	if (newTexture == NULL)
+
+	this->texture = SDL_CreateTextureFromSurface(this->renderer, loadedSurface);
+	if (this->texture == NULL)
 	{
 		printf("loadFromFile(%s) failed, error: %s\n", path, SDL_GetError());
 		return false;
@@ -49,10 +47,10 @@ bool Texture::loadFromFile(SDL_Color transparentColor, char *path)
 	this->height = loadedSurface->h;
 	SDL_FreeSurface(loadedSurface);
 
-	this->texture = newTexture;
-	return this->texture != NULL;
+	return true;
 }
 
+#ifdef _SDL_TTF_H
 bool Texture::loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color)
 {
 	free();
@@ -77,6 +75,7 @@ bool Texture::loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color)
 
 	return true;
 }
+#endif
 
 
 void Texture::setColor(SDL_Color color)

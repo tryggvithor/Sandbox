@@ -15,6 +15,15 @@ namespace globals
 	SDL_Surface *screenSurface = NULL;
 
 	//Experiment specific
+	enum MouseEvents
+	{
+		MOUSE_OUT = 0,
+		MOUSE_OVER_MOTION = 1,
+		MOUSE_DOWN = 2,
+		MOUSE_UP = 3,
+		COUNT = 4
+	};
+
 	Texture *texture = NULL;
 	TTF_Font *font = NULL;
 	char *fontPath = "fonts/ClassCoder.ttf";

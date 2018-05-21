@@ -13,9 +13,11 @@ public:
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
-	bool loadFromFile(SDL_Color transparentColor, char *path);
+	bool loadFromFile(char *path, SDL_Color transparentColor);
+#ifdef _SDL_TTF_H
 	bool loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color);
-	
+#endif
+
 	void setColor(SDL_Color color);
 	void setBlendMode(SDL_BlendMode blendMode);
 	void setAlpha(Uint8 alpha);
