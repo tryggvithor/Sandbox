@@ -1,6 +1,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+
 #include <SDL.h>
 #include "Texture.h"
 
@@ -31,5 +32,6 @@ private:
 	Texture *texture;
 	SDL_Rect *textureClips;
 };
+
 
 #endif // !BUTTON_H

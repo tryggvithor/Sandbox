@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "Texture.h"
 
+
 Texture::Texture(SDL_Renderer *renderer)
 {
 	this->renderer = renderer;
@@ -17,7 +18,7 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(char *path, SDL_Color *transparentColor)
+bool Texture::loadFromFile(const char *path, SDL_Color *transparentColor)
 {
 	free();
 
@@ -54,7 +55,7 @@ bool Texture::loadFromFile(char *path, SDL_Color *transparentColor)
 }
 
 #ifdef _SDL_TTF_H
-bool Texture::loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color)
+bool Texture::loadFromRenderedText(const char *text, TTF_Font *font, SDL_Color color)
 {
 	free();
 

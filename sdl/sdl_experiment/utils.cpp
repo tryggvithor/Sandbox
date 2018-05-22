@@ -1,8 +1,25 @@
+#include <SDL.h>
+#include <SDL_image.h>
+#include <stdio.h>
+#include <string.h>
 #include "utils.h"
 
 namespace utils
 {
+	//Helpers
+
+	//Concatenate two char * into a new malloced char *
+	char * concat(const char *first, const char *second)
+	{
+		size_t size = (strlen(first) + strlen(second)) * sizeof(char) + 1;
+		char *concatted = (char *)malloc(size);
+		SDL_snprintf(concatted, size, "%s%s", first, second);
+		return concatted;
+	}
+
+
 	//Primitives
+
 	void renderFillRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
 	{
 		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
@@ -32,6 +49,7 @@ namespace utils
 
 
 	//Rendering functions
+
 	void renderInViewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect)
 	{
 		SDL_Rect oldViewport;
@@ -45,6 +63,7 @@ namespace utils
 
 
 	//Loading things
+
 	SDL_Texture *loadTexture(SDL_Renderer *renderer, char *filePath)
 	{
 		if (renderer == NULL)

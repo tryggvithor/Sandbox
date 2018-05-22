@@ -1,10 +1,9 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "utils.h"
-
 
 class Texture
 {
@@ -14,9 +13,9 @@ public:
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
-	bool loadFromFile(char *path, SDL_Color *transparentColor = NULL);
+	bool loadFromFile(const char *path, SDL_Color *transparentColor = NULL);
 #ifdef _SDL_TTF_H
-	bool loadFromRenderedText(char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0xFF});
+	bool loadFromRenderedText(const char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0xFF});
 #endif
 
 	void setColor(SDL_Color color);
@@ -30,5 +29,6 @@ private:
 	SDL_Renderer *renderer;
 	SDL_Texture *texture;
 };
+
 
 #endif // !TEXTURE_H

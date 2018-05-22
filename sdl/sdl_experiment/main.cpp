@@ -39,6 +39,8 @@ int main(int argc, char *args[])
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
+	//Experiment specific stuff
+	Uint32 startTime = 0;
 
 
 	while (!globals::hasQuit)
@@ -46,7 +48,7 @@ int main(int argc, char *args[])
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
-
+		
 		while (SDL_PollEvent(&e) != 0)
 		{
 			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
@@ -57,37 +59,8 @@ int main(int argc, char *args[])
 			{
 				switch (e.key.keysym.sym)
 				{
-				case SDLK_1:
-					Mix_PlayChannel(-1, globals::SoundEffects.high, 0);
-					break;
-				case SDLK_2:
-					Mix_PlayChannel(-1, globals::SoundEffects.med, 0);
-					break;
-				case SDLK_3:
-					Mix_PlayChannel(-1, globals::SoundEffects.low, 0);
-					break;
-				case SDLK_4:
-					Mix_PlayChannel(-1, globals::SoundEffects.scratch, 0);
-					break;
-				case SDLK_9:
-					if (Mix_PlayingMusic() == 0)
-					{
-						Mix_PlayMusic(globals::music, -1);
-					}
-					else
-					{
-						if (Mix_PausedMusic() == 1)
-						{
-							Mix_ResumeMusic();
-						}
-						else
-						{
-							Mix_PauseMusic();
-						}
-					}
-					break;
-				case SDLK_0:
-					Mix_HaltMusic();
+				case SDLK_RETURN:
+					startTime = SDL_GetTicks();
 					break;
 				default:
 					break;
@@ -96,11 +69,20 @@ int main(int argc, char *args[])
 
 			//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 		}
+		
+		char time[34];
+		SDL_itoa(SDL_GetTicks() - startTime, time, 10);
+		globals::timeTextWithTime = utils::concat(globals::timeText, time);
+		if (!globals::timeTexture->loadFromRenderedText(globals::timeTextWithTime, globals::font))
+		{
+			printf("Unable to render time texture!\n");
+		}
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::texture->renderAt(0, 0);
+		globals::infoTexture->renderAt(globals::screenWidth/2 - globals::infoTexture->width/2, 0);
+		globals::timeTexture->renderAt(globals::screenWidth/2 - globals::timeTexture->width/2, globals::screenHeight/2 - globals::timeTexture->height);
 
 		SDL_RenderPresent(globals::renderer);
 	}
@@ -108,8 +90,6 @@ int main(int argc, char *args[])
 	close();
 	return 0;
 }
-
-
 
 
 bool init(int screenWidth, int screenHeight)
@@ -158,85 +138,40 @@ bool init(int screenWidth, int screenHeight)
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
-	globals::texture = new Texture(globals::renderer);
+	globals::infoTexture = new Texture(globals::renderer);
+	globals::timeTexture = new Texture(globals::renderer);
 
 	return succeeded;
 }
+
 
 bool loadMedia(SDL_Renderer *renderer)
 {
 	bool succeeded = true;
 
-	TTF_Font *font = TTF_OpenFont("fonts/ClassCoder.ttf", 28);
-	if (font == NULL)
+	globals::font = TTF_OpenFont("fonts/ClassCoder.ttf", 32);
+	if (globals::font == NULL)
 	{
 		printf("loadMedia failed, error: %s\n", TTF_GetError());
 		succeeded = false;
 	}
 
-	if (!globals::texture->loadFromRenderedText("1,2,3,4 for sounds. 9 to play/pause music. 0 to stop music", font))
+	if (!globals::infoTexture->loadFromRenderedText("Press Enter to reset the start time", globals::font))
 	{
 		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		succeeded = false;
 	}
 
-	globals::music = Mix_LoadMUS(globals::musicPath);
-	if (globals::music == NULL)
-	{
-		printf("loadMedia failed, error: %s\n", Mix_GetError());
-		succeeded = false;
-	}
-
-	globals::SoundEffects.scratch = Mix_LoadWAV(globals::SoundEffectPaths.scratch);
-	if (globals::SoundEffects.scratch == NULL)
-	{
-		printf("loadMedia scratch failed, error: %s\n", Mix_GetError());
-		succeeded = false;
-	}
-
-	globals::SoundEffects.high = Mix_LoadWAV(globals::SoundEffectPaths.high);
-	if (globals::SoundEffects.high == NULL)
-	{
-		printf("loadMedia high failed, error: %s\n", Mix_GetError());
-		succeeded = false;
-	}
-
-	globals::SoundEffects.med = Mix_LoadWAV(globals::SoundEffectPaths.med);
-	if (globals::SoundEffects.med == NULL)
-	{
-		printf("loadMedia med failed, error: %s\n", Mix_GetError());
-		succeeded = false;
-	}
-
-	globals::SoundEffects.low = Mix_LoadWAV(globals::SoundEffectPaths.low);
-	if (globals::SoundEffects.low == NULL)
-	{
-		printf("loadMedia low failed, error: %s\n", Mix_GetError());
-		succeeded = false;
-	}
-
-	return succeeded;
+	return succeeded; 
 }
 
 
 void close()
 {
 	//Textures
-	delete globals::texture;
-
-	//Sounds
-	Mix_FreeChunk(globals::SoundEffects.scratch);
-	Mix_FreeChunk(globals::SoundEffects.high);
-	Mix_FreeChunk(globals::SoundEffects.med);
-	Mix_FreeChunk(globals::SoundEffects.low);
-	globals::SoundEffects.scratch = NULL;
-	globals::SoundEffects.high = NULL;
-	globals::SoundEffects.med = NULL;
-	globals::SoundEffects.low = NULL;
-
-	//Music
-	Mix_FreeMusic(globals::music);
-	globals::music = NULL;
+	delete globals::infoTexture;
+	delete globals::timeTexture;
+	free(globals::timeTextWithTime);
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
