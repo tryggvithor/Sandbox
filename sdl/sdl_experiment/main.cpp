@@ -59,8 +59,25 @@ int main(int argc, char *args[])
 			{
 				switch (e.key.keysym.sym)
 				{
-				case SDLK_RETURN:
-					startTime = SDL_GetTicks();
+				case SDLK_s:
+					if (globals::timer.isStarted())
+					{
+						globals::timer.stop();
+					}
+					else
+					{
+						globals::timer.start();
+					}
+					break;
+				case SDLK_p: 
+					if (globals::timer.isPaused())
+					{
+						globals::timer.unpause();
+					}
+					else
+					{
+						globals::timer.pause();
+					}
 					break;
 				default:
 					break;
@@ -70,8 +87,8 @@ int main(int argc, char *args[])
 			//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 		}
 		
-		char time[34];
-		SDL_itoa(SDL_GetTicks() - startTime, time, 10);
+		char time[64];
+		SDL_snprintf(time, sizeof(time), "%.3f", globals::timer.getTicks() / 1000.f);
 		globals::timeTextWithTime = utils::concat(globals::timeText, time);
 		if (!globals::timeTexture->loadFromRenderedText(globals::timeTextWithTime, globals::font))
 		{
@@ -82,7 +99,8 @@ int main(int argc, char *args[])
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::infoTexture->renderAt(globals::screenWidth/2 - globals::infoTexture->width/2, 0);
+		globals::startTexture->renderAt(globals::screenWidth/2 - globals::startTexture->width/2, 0);
+		globals::pauseTexture->renderAt(globals::screenWidth/2 - globals::pauseTexture->width/2, globals::startTexture->height);
 		globals::timeTexture->renderAt(globals::screenWidth/2 - globals::timeTexture->width/2, globals::screenHeight/2 - globals::timeTexture->height);
 
 		SDL_RenderPresent(globals::renderer);
@@ -139,7 +157,8 @@ bool init(int screenWidth, int screenHeight)
 	}
 
 	globals::screenSurface = SDL_GetWindowSurface(globals::window);
-	globals::infoTexture = new Texture(globals::renderer);
+	globals::startTexture = new Texture(globals::renderer);
+	globals::pauseTexture = new Texture(globals::renderer);
 	globals::timeTexture = new Texture(globals::renderer);
 
 	return succeeded;
@@ -157,7 +176,13 @@ bool loadMedia(SDL_Renderer *renderer)
 		succeeded = false;
 	}
 
-	if (!globals::infoTexture->loadFromRenderedText("Press Enter to reset the start time", globals::font))
+	if (!globals::startTexture->loadFromRenderedText("Press S to start/stop the timer", globals::font))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		succeeded = false;
+	}
+
+	if (!globals::pauseTexture->loadFromRenderedText("Press P to pause/unpause the timer", globals::font))
 	{
 		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		succeeded = false;
@@ -169,16 +194,8 @@ bool loadMedia(SDL_Renderer *renderer)
 
 void close()
 {
-	//Textures
-	delete globals::infoTexture;
-	delete globals::timeTexture;
-
-	//Window
-	SDL_DestroyRenderer(globals::renderer);
-	SDL_DestroyWindow(globals::window);
-	globals::renderer = NULL;
-	globals::window = NULL;
-	globals::screenSurface = NULL;
+	//Clean up all globals
+	globals::cleanUp();
 
 	//SDL subsystems
 #ifdef _SDL_TTF_H

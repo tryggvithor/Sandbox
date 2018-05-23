@@ -1,7 +1,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <stdio.h>
-#include <string.h>
 #include "utils.h"
 
 namespace utils
@@ -11,7 +10,8 @@ namespace utils
 	//Concatenate two char * into a new malloced char *
 	char * concat(const char *first, const char *second)
 	{
-		size_t size = (strlen(first) + strlen(second)) * sizeof(char) + 1;
+		//Size of both char ptrs with a null terminator
+		size_t size = (SDL_strlen(first) + SDL_strlen(second)) * sizeof(char) + 1;
 		char *concatted = (char *)malloc(size);
 		SDL_snprintf(concatted, size, "%s%s", first, second);
 		return concatted;

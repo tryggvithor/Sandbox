@@ -6,7 +6,7 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 #include "Texture.h"
-#include "Button.h"
+#include "Timer.h"
 
 namespace globals
 {
@@ -19,11 +19,28 @@ namespace globals
 	SDL_Surface *screenSurface = NULL;
 
 	//Experiment specific stuff
-	const char *timeText = "Milliseconds since start time: ";
-	char * timeTextWithTime = NULL;
-	Texture *infoTexture = NULL;
+	Timer timer;
+	const char *timeText = "Timer seconds: ";
+	char *timeTextWithTime = NULL;
+	Texture *startTexture = NULL;
 	Texture *timeTexture = NULL;
+	Texture *pauseTexture = NULL;
 	TTF_Font *font = NULL;
+
+	void cleanUp()
+	{
+		//Textures
+		delete globals::startTexture;
+		delete globals::timeTexture;
+		delete globals::pauseTexture;
+
+		//Window
+		SDL_DestroyRenderer(globals::renderer);
+		SDL_DestroyWindow(globals::window);
+		globals::renderer = NULL;
+		globals::window = NULL;
+		globals::screenSurface = NULL;
+	}
 };
 
 
