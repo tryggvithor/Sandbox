@@ -77,6 +77,7 @@ int main(int argc, char *args[])
 		{
 			printf("Unable to render time texture!\n");
 		}
+		free(globals::timeTextWithTime);
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
@@ -171,7 +172,6 @@ void close()
 	//Textures
 	delete globals::infoTexture;
 	delete globals::timeTexture;
-	free(globals::timeTextWithTime);
 
 	//Window
 	SDL_DestroyRenderer(globals::renderer);
