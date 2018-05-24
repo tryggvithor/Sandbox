@@ -4,6 +4,7 @@
 #include <SDL_mixer.h>
 #include <stdio.h>
 #include "Texture.h"
+#include "Timer.h"
 
 #include "globals.h"
 #include "utils.h"
@@ -20,7 +21,7 @@ int main(int argc, char *args[])
 {
 	printf("\n");
 
-	if (!init(globals::screenWidth, globals::screenHeight))
+	if (!init(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT))
 	{
 		printf("Failed to initalize\n");
 		return 0;
@@ -42,6 +43,7 @@ int main(int argc, char *args[])
 	//Experiment specific stuff
 	char *timeText = NULL;
 	Timer fpsTimer;
+	Timer capTimer;
 
 	fpsTimer.start();
 	int countedFrames = 0;
@@ -49,16 +51,14 @@ int main(int argc, char *args[])
 
 	while (!globals::hasQuit)
 	{
+		capTimer.start();
+		
+
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
-		averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
-		if (averageFPS > 9000)
-		{
-			averageFPS = 0;
-		}
-
 		
+
 		while (SDL_PollEvent(&e) != 0)
 		{
 			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
@@ -70,25 +70,7 @@ int main(int argc, char *args[])
 				switch (e.key.keysym.sym)
 				{
 				case SDLK_s:
-					if (fpsTimer.isStarted())
-					{
-						fpsTimer.stop();
-					}
-					else
-					{
-						fpsTimer.start();
-					}
-					break;
-				case SDLK_p: 
-					if (fpsTimer.isPaused())
-					{
-						fpsTimer.unpause();
-					}
-					else
-					{
-						fpsTimer.pause();
-					}
-					break;
+					printf("Nice\n");
 				default:
 					break;
 				}
@@ -97,9 +79,16 @@ int main(int argc, char *args[])
 			//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 		}
 		
+
+		averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
+		if (averageFPS > 1000000)
+		{
+			averageFPS = 0;
+		}
+
 		char time[64];
 		SDL_snprintf(time, sizeof(time), "%.3f", averageFPS);
-		timeText = utils::concat("Average frames per second: ", time);
+		timeText = utils::concat("Average capped frames per second: ", time);
 		if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
 		{
 			printf("Unable to render time texture!\n");
@@ -109,13 +98,19 @@ int main(int argc, char *args[])
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
 
-		globals::startTexture->renderAt(globals::screenWidth/2 - globals::startTexture->width/2, 0);
-		globals::pauseTexture->renderAt(globals::screenWidth/2 - globals::pauseTexture->width/2, globals::startTexture->height);
-		globals::timeTexture->renderAt(globals::screenWidth/2 - globals::timeTexture->width/2, globals::screenHeight/2 - globals::timeTexture->height);
+		globals::startTexture->renderAt(globals::SCREEN_WIDTH/2 - globals::startTexture->width/2, 0);
+		globals::pauseTexture->renderAt(globals::SCREEN_WIDTH/2 - globals::pauseTexture->width/2, globals::startTexture->height);
+		globals::timeTexture->renderAt(globals::SCREEN_WIDTH/2 - globals::timeTexture->width/2, globals::SCREEN_HEIGHT/2 - globals::timeTexture->height);
 
 		SDL_RenderPresent(globals::renderer);
 
+
 		countedFrames++;
+		int frameTicks = capTimer.getTicks();
+		if (frameTicks < globals::SCREEN_TICKS_PER_FRAME)
+		{
+			SDL_Delay(globals::SCREEN_TICKS_PER_FRAME - frameTicks);
+		}
 	}
 
 	close();
@@ -161,7 +156,7 @@ bool init(int screenWidth, int screenHeight)
 		succeeded = false;
 	}
 
-	globals::renderer = SDL_CreateRenderer(globals::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	globals::renderer = SDL_CreateRenderer(globals::window, -1, SDL_RENDERER_ACCELERATED);
 	if (globals::renderer == NULL)
 	{
 		printf("SDL_CreateRenderer failed, error: %s\n", SDL_GetError());
