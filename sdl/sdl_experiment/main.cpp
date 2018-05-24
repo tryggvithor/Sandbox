@@ -40,14 +40,24 @@ int main(int argc, char *args[])
 	double deltaTime = 0;
 
 	//Experiment specific stuff
-	Uint32 startTime = 0;
+	char *timeText = NULL;
+	Timer fpsTimer;
 
+	fpsTimer.start();
+	int countedFrames = 0;
+	float averageFPS = 0.0f;
 
 	while (!globals::hasQuit)
 	{
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+		averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
+		if (averageFPS > 9000)
+		{
+			averageFPS = 0;
+		}
+
 		
 		while (SDL_PollEvent(&e) != 0)
 		{
@@ -60,23 +70,23 @@ int main(int argc, char *args[])
 				switch (e.key.keysym.sym)
 				{
 				case SDLK_s:
-					if (globals::timer.isStarted())
+					if (fpsTimer.isStarted())
 					{
-						globals::timer.stop();
+						fpsTimer.stop();
 					}
 					else
 					{
-						globals::timer.start();
+						fpsTimer.start();
 					}
 					break;
 				case SDLK_p: 
-					if (globals::timer.isPaused())
+					if (fpsTimer.isPaused())
 					{
-						globals::timer.unpause();
+						fpsTimer.unpause();
 					}
 					else
 					{
-						globals::timer.pause();
+						fpsTimer.pause();
 					}
 					break;
 				default:
@@ -88,13 +98,13 @@ int main(int argc, char *args[])
 		}
 		
 		char time[64];
-		SDL_snprintf(time, sizeof(time), "%.3f", globals::timer.getTicks() / 1000.f);
-		globals::timeTextWithTime = utils::concat(globals::timeText, time);
-		if (!globals::timeTexture->loadFromRenderedText(globals::timeTextWithTime, globals::font))
+		SDL_snprintf(time, sizeof(time), "%.3f", averageFPS);
+		timeText = utils::concat("Average frames per second: ", time);
+		if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
 		{
 			printf("Unable to render time texture!\n");
 		}
-		free(globals::timeTextWithTime);
+		free(timeText);
 
 		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(globals::renderer);
@@ -104,6 +114,8 @@ int main(int argc, char *args[])
 		globals::timeTexture->renderAt(globals::screenWidth/2 - globals::timeTexture->width/2, globals::screenHeight/2 - globals::timeTexture->height);
 
 		SDL_RenderPresent(globals::renderer);
+
+		countedFrames++;
 	}
 
 	close();

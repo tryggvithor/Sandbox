@@ -19,9 +19,6 @@ namespace globals
 	SDL_Surface *screenSurface = NULL;
 
 	//Experiment specific stuff
-	Timer timer;
-	const char *timeText = "Timer seconds: ";
-	char *timeTextWithTime = NULL;
 	Texture *startTexture = NULL;
 	Texture *timeTexture = NULL;
 	Texture *pauseTexture = NULL;
