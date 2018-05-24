@@ -12,6 +12,7 @@
 
 bool init(int screenWidth, int screenHeight);
 bool loadMedia(SDL_Renderer *renderer);
+void handleInputs(SDL_Event *e);
 void close();
 
 
@@ -52,57 +53,41 @@ int main(int argc, char *args[])
 	while (!globals::hasQuit)
 	{
 		capTimer.start();
-		
 
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 		
 
-		while (SDL_PollEvent(&e) != 0)
-		{
-			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
-			{
-				globals::hasQuit = true;
-			}
-			if (e.type == SDL_KEYDOWN)
-			{
-				switch (e.key.keysym.sym)
-				{
-				case SDLK_s:
-					printf("Nice\n");
-				default:
-					break;
-				}
-			}
+		handleInputs(&e);
 
-			//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-		}
+		{//update()?
+			averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
+			if (averageFPS > 1000000)
+			{
+				averageFPS = 0;
+			}
 		
-
-		averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
-		if (averageFPS > 1000000)
-		{
-			averageFPS = 0;
+			char time[64];
+			SDL_snprintf(time, sizeof(time), "%.3f", averageFPS);
+			timeText = utils::concat("Average capped frames per second: ", time);
+			if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
+			{
+				printf("Unable to render time texture!\n");
+			}
+			free(timeText);
 		}
 
-		char time[64];
-		SDL_snprintf(time, sizeof(time), "%.3f", averageFPS);
-		timeText = utils::concat("Average capped frames per second: ", time);
-		if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
-		{
-			printf("Unable to render time texture!\n");
+		{//render()?
+			SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+			SDL_RenderClear(globals::renderer);
+
+			globals::startTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::startTexture->width / 2, 0);
+			globals::pauseTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
+			globals::timeTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
+
+			SDL_RenderPresent(globals::renderer);
 		}
-		free(timeText);
-
-		SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-		SDL_RenderClear(globals::renderer);
-
-		globals::startTexture->renderAt(globals::SCREEN_WIDTH/2 - globals::startTexture->width/2, 0);
-		globals::pauseTexture->renderAt(globals::SCREEN_WIDTH/2 - globals::pauseTexture->width/2, globals::startTexture->height);
-		globals::timeTexture->renderAt(globals::SCREEN_WIDTH/2 - globals::timeTexture->width/2, globals::SCREEN_HEIGHT/2 - globals::timeTexture->height);
-
-		SDL_RenderPresent(globals::renderer);
 
 
 		countedFrames++;
@@ -196,6 +181,30 @@ bool loadMedia(SDL_Renderer *renderer)
 	}
 
 	return succeeded; 
+}
+
+
+void handleInputs(SDL_Event *e)
+{
+	while (SDL_PollEvent(e) != 0)
+	{
+		if (e->type == SDL_QUIT || (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE))
+		{
+			globals::hasQuit = true;
+		}
+		if (e->type == SDL_KEYDOWN)
+		{
+			switch (e->key.keysym.sym)
+			{
+			case SDLK_s:
+				printf("Nice\n");
+			default:
+				break;
+			}
+		}
+
+		//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+	}
 }
 
 
