@@ -12,7 +12,6 @@
 
 bool init(int screenWidth, int screenHeight);
 bool loadMedia(SDL_Renderer *renderer);
-void handleInputs(SDL_Event *e);
 void close();
 
 
@@ -59,9 +58,29 @@ int main(int argc, char *args[])
 		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
 		
 
-		handleInputs(&e);
+		{//handleInputs(e)?
+			while (SDL_PollEvent(&e) != 0)
+			{
+				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
+				{
+					globals::hasQuit = true;
+				}
+				if (e.type == SDL_KEYDOWN)
+				{
+					switch (e.key.keysym.sym)
+					{
+					case SDLK_s:
+						printf("Nice\n");
+					default:
+						break;
+					}
+				}
 
-		{//update()?
+				//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+			}
+		}
+
+		{//update(deltaTime)?
 			averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
 			if (averageFPS > 1000000)
 			{
@@ -181,30 +200,6 @@ bool loadMedia(SDL_Renderer *renderer)
 	}
 
 	return succeeded; 
-}
-
-
-void handleInputs(SDL_Event *e)
-{
-	while (SDL_PollEvent(e) != 0)
-	{
-		if (e->type == SDL_QUIT || (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_ESCAPE))
-		{
-			globals::hasQuit = true;
-		}
-		if (e->type == SDL_KEYDOWN)
-		{
-			switch (e->key.keysym.sym)
-			{
-			case SDLK_s:
-				printf("Nice\n");
-			default:
-				break;
-			}
-		}
-
-		//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-	}
 }
 
 
