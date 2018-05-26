@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "Texture.h"
 #include "Timer.h"
+#include "Dot.h"
 
 #include "globals.h"
 #include "utils.h"
@@ -40,7 +41,7 @@ int main(int argc, char *args[])
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 
-	//Experiment specific stuff
+
 	char *timeText = NULL;
 	Timer fpsTimer;
 	Timer capTimer;
@@ -48,6 +49,10 @@ int main(int argc, char *args[])
 	fpsTimer.start();
 	int countedFrames = 0;
 	float averageFPS = 0.0f;
+
+
+	//Experiment specific stuff
+	Dot dot = Dot(globals::dotTexture);
 
 	while (!globals::hasQuit)
 	{
@@ -65,6 +70,7 @@ int main(int argc, char *args[])
 				{
 					globals::hasQuit = true;
 				}
+				
 				if (e.type == SDL_KEYDOWN)
 				{
 					switch (e.key.keysym.sym)
@@ -77,6 +83,8 @@ int main(int argc, char *args[])
 				}
 
 				//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
+				dot.handleEvent(e);
 			}
 		}
 
@@ -95,6 +103,8 @@ int main(int argc, char *args[])
 				printf("Unable to render time texture!\n");
 			}
 			free(timeText);
+
+			dot.update();
 		}
 
 		{//render()?
@@ -104,6 +114,8 @@ int main(int argc, char *args[])
 			globals::startTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::startTexture->width / 2, 0);
 			globals::pauseTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
 			globals::timeTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
+
+			dot.render();
 
 			SDL_RenderPresent(globals::renderer);
 		}
@@ -171,6 +183,7 @@ bool init(int screenWidth, int screenHeight)
 	globals::startTexture = new Texture(globals::renderer);
 	globals::pauseTexture = new Texture(globals::renderer);
 	globals::timeTexture = new Texture(globals::renderer);
+	globals::dotTexture = new Texture(globals::renderer);
 
 	return succeeded;
 }
@@ -199,14 +212,32 @@ bool loadMedia(SDL_Renderer *renderer)
 		succeeded = false;
 	}
 
+	if (!globals::dotTexture->loadFromFile("images/dot.bmp"))
+	{
+		printf("loadMedia failed, error: %s\n", SDL_GetError());
+		succeeded = false;
+	}
+
 	return succeeded; 
 }
 
 
 void close()
 {
-	//Clean up all globals
-	globals::cleanUp();
+	{//global cleanup
+		//Textures
+		delete globals::startTexture;
+		delete globals::timeTexture;
+		delete globals::pauseTexture;
+		delete globals::dotTexture;
+
+		//Window
+		SDL_DestroyRenderer(globals::renderer);
+		SDL_DestroyWindow(globals::window);
+		globals::renderer = NULL;
+		globals::window = NULL;
+		globals::screenSurface = NULL;
+	}
 
 	//SDL subsystems
 #ifdef _SDL_TTF_H

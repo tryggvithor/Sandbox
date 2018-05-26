@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Dot.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -144,6 +145,7 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="globals.h" />
+    <ClInclude Include="Dot.h" />
     <ClInclude Include="Texture.h">
       <SubType>
       </SubType>

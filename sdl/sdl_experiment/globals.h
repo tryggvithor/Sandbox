@@ -11,35 +11,21 @@
 namespace globals
 {
 	//Default stuff
-	bool hasQuit = false;
-	const int SCREEN_WIDTH = 1280;
-	const int SCREEN_HEIGHT = 720;
-	const int SCREEN_FPS = 60; 
-	const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
-	SDL_Renderer *renderer = NULL;
-	SDL_Window *window = NULL;
-	SDL_Surface *screenSurface = NULL;
+	static bool hasQuit = false;
+	static const int SCREEN_WIDTH = 1280;
+	static const int SCREEN_HEIGHT = 720;
+	static const int SCREEN_FPS = 60;
+	static const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
+	static SDL_Renderer *renderer = NULL;
+	static SDL_Window *window = NULL;
+	static SDL_Surface *screenSurface = NULL;
 
 	//Experiment specific stuff
-	Texture *startTexture = NULL;
-	Texture *timeTexture = NULL;
-	Texture *pauseTexture = NULL;
-	TTF_Font *font = NULL;
-
-	void cleanUp()
-	{
-		//Textures
-		delete globals::startTexture;
-		delete globals::timeTexture;
-		delete globals::pauseTexture;
-
-		//Window
-		SDL_DestroyRenderer(globals::renderer);
-		SDL_DestroyWindow(globals::window);
-		globals::renderer = NULL;
-		globals::window = NULL;
-		globals::screenSurface = NULL;
-	}
+	static Texture *startTexture = NULL;
+	static Texture *timeTexture = NULL;
+	static Texture *pauseTexture = NULL;
+	static Texture *dotTexture = NULL;
+	static TTF_Font *font = NULL;
 };
 
 
