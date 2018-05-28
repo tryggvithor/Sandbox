@@ -15,12 +15,13 @@ public:
 
 	int posX, posY;
 	int velX, velY;
+	SDL_Rect collider;
 
 	Dot(Texture *texture);
 
 	void handleEvent(SDL_Event &e);
 
-	void update();
+	void update(SDL_Rect &wall);
 
 	void render();
 private:

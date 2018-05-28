@@ -53,6 +53,11 @@ int main(int argc, char *args[])
 
 	//Experiment specific stuff
 	Dot dot = Dot(globals::dotTexture);
+	SDL_Rect wall;
+	wall.x = 300;
+	wall.y = 40;
+	wall.w = 40;
+	wall.h = 400;
 
 	while (!globals::hasQuit)
 	{
@@ -104,7 +109,7 @@ int main(int argc, char *args[])
 			}
 			free(timeText);
 
-			dot.update();
+			dot.update(wall);
 		}
 
 		{//render()?
@@ -115,6 +120,7 @@ int main(int argc, char *args[])
 			globals::pauseTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
 			globals::timeTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
 
+			utils::renderOutlineRect(globals::renderer, {0,0,0,0xFF}, wall);
 			dot.render();
 
 			SDL_RenderPresent(globals::renderer);

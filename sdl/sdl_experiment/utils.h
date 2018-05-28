@@ -21,6 +21,13 @@ namespace utils
 	}
 
 
+	//Collision
+	static bool rectCollision(SDL_Rect a, SDL_Rect b)
+	{
+		return SDL_HasIntersection(&a, &b);
+	}
+
+
 	//Primitives
 
 	static void renderFillRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
