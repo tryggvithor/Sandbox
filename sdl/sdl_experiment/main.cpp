@@ -104,7 +104,7 @@ int main(int argc, char *args[])
 			SDL_snprintf(fpsText, sizeof(fpsText), "%.3f", averageFPS);
 
 			char shitter[10];
-			if (utils::rectCollision(dot.collider, wall))
+			if (rectCollision(dot.collider, wall))
 			{
 				SDL_snprintf(shitter, sizeof(shitter), "%s", "YES");
 			}
@@ -112,7 +112,7 @@ int main(int argc, char *args[])
 			{
 				SDL_snprintf(shitter, sizeof(shitter), "%s", "NOO");
 			}
-			timeText = concat("FPS: ", fpsText, ", Colliding: ", shitter);
+			timeText = str_concat("FPS: ", fpsText, ", Colliding: ", shitter);
 			//timeText = utils::concat(4, "FPS: ", fpsText, "Colliding: ", shitter);
 			//timeText = utils::concat("Average capped frames per second: ", time);
 			if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
@@ -132,7 +132,7 @@ int main(int argc, char *args[])
 			globals::pauseTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
 			globals::timeTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
 
-			utils::renderOutlineRect(globals::renderer, {0,0,0,0xFF}, wall);
+			renderOutlineRect(globals::renderer, {0,0,0,0xFF}, wall);
 			dot.render();
 
 			SDL_RenderPresent(globals::renderer);

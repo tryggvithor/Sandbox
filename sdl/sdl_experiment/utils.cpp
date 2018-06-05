@@ -1,0 +1,188 @@
+#include <stdio.h>
+#include "utils.h"
+
+//Helpers
+
+//Concatenate variable amount of char *, null terminated into a new limited length malloced char *
+char * _str_concat(char *first, ...)
+{
+	va_list args;
+	va_start(args, first);
+
+	char * str = first;
+	char * concatted = (char*)malloc(256);
+	char * ptr = concatted;
+	size_t length;
+	do
+	{
+		length = SDL_strlen(str);
+		SDL_memcpy(ptr, str, length);
+
+		ptr += length;
+		str = va_arg(args, char*);
+	} while (str != NULL);
+	*ptr = '\0';
+
+	va_end(args);
+
+	return concatted;
+}
+
+
+//Concatenate two char * into a new malloced char *
+/*static char * concat(const char *first, const char *second)
+{
+	//Size of both char ptrs with a null terminator
+	size_t size = (SDL_strlen(first) + SDL_strlen(second)) * sizeof(char) + 1;
+	char *concatted = (char *)malloc(size);
+	SDL_snprintf(concatted, size, "%s%s", first, second);
+	return concatted;
+}
+
+//Concatenate variable amount of char * into a new malloced char *
+static char * concat(int count, ...)
+{
+	//Size of both char ptrs with a null terminator
+	va_list args;
+	va_start(args, count);
+
+	size_t size = 0;
+	char *nice = NULL;
+	for (int i = 0; i < count - 1; ++i)
+	{
+		nice = va_arg(args, char *);
+		size += SDL_strlen(nice);
+	}
+	size = size * sizeof(char) + 1;
+
+	auto getFmt = [] (int n, const char * s)
+	{
+		size_t slen = SDL_strlen(s);
+		char * dest = (char *)malloc(n*slen + 1);
+
+		int i; char * p;
+		for (i = 0, p = dest; i < n; ++i, p += slen)
+		{
+			SDL_memcpy(p, s, slen);
+		}
+		*p = '\0';
+		return dest;
+	};
+	const char * fmt = getFmt(count, "%s");
+
+	char *concatted = (char *)malloc(size);
+	SDL_snprintf(concatted, size, fmt, args);
+	return concatted;
+}*/
+
+
+
+
+//Collision
+
+//Rect
+extern bool rectCollision(SDL_Rect a, SDL_Rect b)
+{
+	return SDL_HasIntersection(&a, &b);
+}
+
+
+//Primitives
+
+extern void renderFillRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderFillRect(renderer, &rect);
+}
+
+extern void renderOutlineRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderDrawRect(renderer, &rect);
+}
+
+extern void renderHorizontalLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	SDL_RenderDrawLine(renderer, pos1.x, pos1.y, pos2.x, pos2.y);
+}
+
+extern void renderVerticalDottedLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2, int interval)
+{
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+	for (int i = pos1.y; i < pos2.y; i += interval)
+	{
+		SDL_RenderDrawPoint(renderer, pos1.x, i);
+	}
+}
+
+
+//Rendering functions
+
+extern void renderInViewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect)
+{
+	SDL_Rect oldViewport;
+	SDL_RenderGetViewport(renderer, &oldViewport);
+
+	SDL_RenderSetViewport(renderer, viewportRect);
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+
+	SDL_RenderSetViewport(renderer, &oldViewport);
+}
+
+
+//Loading things
+
+extern SDL_Texture *loadTexture(SDL_Renderer *renderer, char *filePath)
+{
+	if (renderer == NULL)
+	{
+		printf("loadTexture() failed for %s, renderer was NULL\n", filePath);
+		return NULL;
+	}
+
+	SDL_Surface *loadedSurface = IMG_Load(filePath);
+	if (loadedSurface == NULL)
+	{
+		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+
+	SDL_Texture *newTexture = NULL;
+	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+	if (newTexture == NULL)
+	{
+		printf("Failed to create texture from %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+
+	SDL_FreeSurface(loadedSurface);
+	return newTexture;
+}
+
+extern SDL_Surface *loadSurface(SDL_Surface *screenSurface, char *filePath)
+{
+	if (screenSurface == NULL)
+	{
+		printf("loadSurface() failed for %s, screenSurface was NULL\n", filePath);
+		return NULL;
+	}
+
+	SDL_Surface *loadedSurface = IMG_Load(filePath);
+	if (loadedSurface == NULL)
+	{
+		printf("Failed to load image %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+
+	//Optimize the loaded image to the correct format
+	SDL_Surface *optimizedSurface = NULL;
+	optimizedSurface = SDL_ConvertSurface(loadedSurface, screenSurface->format, NULL);
+	if (optimizedSurface == NULL)
+	{
+		printf("Failed to optimize image %s, error: %s\n", filePath, SDL_GetError());
+		return NULL;
+	}
+
+	return optimizedSurface;
+}

@@ -65,7 +65,7 @@ void Dot::update(SDL_Rect &wall)
 	collider.x = posX;
 
 	if (posX < 0 || posX + DOT_WIDTH > globals::SCREEN_WIDTH ||
-		utils::rectCollision(collider, wall))
+		rectCollision(collider, wall))
 	{
 	}
 
@@ -74,7 +74,7 @@ void Dot::update(SDL_Rect &wall)
 	collider.y = posY;
 
 	if (posY < 0 || posY + DOT_HEIGHT > globals::SCREEN_HEIGHT || 
-		utils::rectCollision(collider, wall))
+		rectCollision(collider, wall))
 	{
 	}
 }
