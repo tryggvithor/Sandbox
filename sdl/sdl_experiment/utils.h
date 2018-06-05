@@ -6,12 +6,40 @@
 #include <SDL_image.h>
 #include <stdio.h>
 
+static char * _concat(char *first, ...);
+#define concat(x, ...) _concat(x, __VA_ARGS__, NULL)
+
+//Concatenate variable amount of char * into a new malloced char *
+static char * _concat(char *first, ...)
+{
+	va_list args;
+	va_start(args, first);
+
+	char * str = first;
+	char * concatted = (char*)malloc(256);
+	char * ptr = concatted;
+	size_t length;
+	do
+	{
+		length = SDL_strlen(str);
+		SDL_memcpy(ptr, str, length);
+
+		ptr += length;
+		str = va_arg(args, char*);
+	} while (str != NULL);
+	*ptr = '\0';
+
+	va_end(args);
+
+	return concatted;
+}
+
 namespace utils
 {
 	//Helpers
 
 	//Concatenate two char * into a new malloced char *
-	static char * concat(const char *first, const char *second)
+	/*static char * concat(const char *first, const char *second)
 	{
 		//Size of both char ptrs with a null terminator
 		size_t size = (SDL_strlen(first) + SDL_strlen(second)) * sizeof(char) + 1;
@@ -20,8 +48,48 @@ namespace utils
 		return concatted;
 	}
 
+	//Concatenate variable amount of char * into a new malloced char *
+	static char * concat(int count, ...)
+	{
+		//Size of both char ptrs with a null terminator
+		va_list args;
+		va_start(args, count);
+		
+		size_t size = 0;
+		char *nice = NULL;
+		for (int i = 0; i < count-1; ++i)
+		{
+			nice = va_arg(args, char *);
+			size += SDL_strlen(nice);
+		}
+		size = size * sizeof(char) + 1;
+
+		auto getFmt = [] (int n, const char * s) 
+		{
+			size_t slen = SDL_strlen(s);
+			char * dest = (char *)malloc(n*slen + 1);
+
+			int i; char * p;
+			for (i = 0, p = dest; i < n; ++i, p += slen)
+			{
+				SDL_memcpy(p, s, slen);
+			}
+			*p = '\0';
+			return dest;
+		};
+		const char * fmt = getFmt(count, "%s");
+		
+		char *concatted = (char *)malloc(size);
+		SDL_snprintf(concatted, size, fmt, args);
+		return concatted;
+	}*/
+
+
+
 
 	//Collision
+
+	//Rect
 	static bool rectCollision(SDL_Rect a, SDL_Rect b)
 	{
 		return SDL_HasIntersection(&a, &b);
@@ -128,6 +196,7 @@ namespace utils
 		return optimizedSurface;
 	}
 }
+
 
 
 #endif // !UTILS_H

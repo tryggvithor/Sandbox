@@ -97,12 +97,24 @@ int main(int argc, char *args[])
 			averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
 			if (averageFPS > 1000000)
 			{
-				averageFPS = 0;
+				averageFPS = 0.0f;
 			}
 		
-			char time[64];
-			SDL_snprintf(time, sizeof(time), "%.3f", averageFPS);
-			timeText = utils::concat("Average capped frames per second: ", time);
+			char fpsText[64];
+			SDL_snprintf(fpsText, sizeof(fpsText), "%.3f", averageFPS);
+
+			char shitter[10];
+			if (utils::rectCollision(dot.collider, wall))
+			{
+				SDL_snprintf(shitter, sizeof(shitter), "%s", "YES");
+			}
+			else
+			{
+				SDL_snprintf(shitter, sizeof(shitter), "%s", "NOO");
+			}
+			timeText = concat("FPS: ", fpsText, ", Colliding: ", shitter);
+			//timeText = utils::concat(4, "FPS: ", fpsText, "Colliding: ", shitter);
+			//timeText = utils::concat("Average capped frames per second: ", time);
 			if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
 			{
 				printf("Unable to render time texture!\n");
