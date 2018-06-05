@@ -7,8 +7,9 @@
 
 //Helpers
 
-//Concatenate variable amount of char * into a new limited length malloced char *
+//Concatenate variable amount of char * ending with a NULL into a new limited length malloced char *
 char * _str_concat(char *first, ...);
+//Concatenate variable amount of char * into a new limited length malloced char *
 #define str_concat(x, ...) _str_concat(x, __VA_ARGS__, NULL)
 
 //Collision

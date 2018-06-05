@@ -3,7 +3,7 @@
 
 //Helpers
 
-//Concatenate variable amount of char *, null terminated into a new limited length malloced char *
+//Concatenate variable amount of char * ending with a NULL into a new limited length malloced char *
 char * _str_concat(char *first, ...)
 {
 	va_list args;
@@ -13,14 +13,14 @@ char * _str_concat(char *first, ...)
 	char * concatted = (char*)malloc(256);
 	char * ptr = concatted;
 	size_t length;
-	do
+	while (str != NULL)
 	{
 		length = SDL_strlen(str);
 		SDL_memcpy(ptr, str, length);
 
 		ptr += length;
 		str = va_arg(args, char*);
-	} while (str != NULL);
+	} 
 	*ptr = '\0';
 
 	va_end(args);
