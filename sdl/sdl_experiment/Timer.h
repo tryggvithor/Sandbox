@@ -15,12 +15,12 @@ public:
 	void unpause();
 
 	//Get the timer's time in milliseconds
-	Uint32 getTicks();
+	Uint32 get_ticks();
 
 	//Timer is running but can be paused or unpaused
-	bool isStarted();
+	bool is_started();
 	//Timer is running and is paused
-	bool isPaused();
+	bool is_paused();
 
 private:
 	Uint32 startTicks;

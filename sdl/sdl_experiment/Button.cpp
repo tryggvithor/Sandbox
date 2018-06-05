@@ -17,7 +17,7 @@ Button::~Button()
 
 }
 
-void Button::handleEvent(SDL_Event *e)
+void Button::handle_event(SDL_Event *e)
 {
 	if (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type || SDL_MOUSEBUTTONUP)
 	{
@@ -56,5 +56,5 @@ void Button::handleEvent(SDL_Event *e)
 
 void Button::render()
 {
-	this->texture->renderAt(this->pos.x, this->pos.y, &this->textureClips[this->currentState]);
+	this->texture->render_at(this->pos.x, this->pos.y, &this->textureClips[this->currentState]);
 }

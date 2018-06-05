@@ -24,7 +24,7 @@ public:
 	Button(Texture *texture, SDL_Rect *textureClips, int width, int height);
 	~Button();
 
-	void handleEvent(SDL_Event *e);
+	void handle_event(SDL_Event *e);
 	void render();
 
 private:

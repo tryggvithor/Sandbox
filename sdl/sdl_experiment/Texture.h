@@ -13,16 +13,16 @@ public:
 	Texture(SDL_Renderer *renderer);
 	~Texture();
 
-	bool loadFromFile(const char *path, SDL_Color *transparentColor = NULL);
+	bool load_from_file(const char *path, SDL_Color *transparentColor = NULL);
 #ifdef _SDL_TTF_H
-	bool loadFromRenderedText(const char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0xFF});
+	bool load_from_rendered_text(const char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0xFF});
 #endif
 
-	void setColor(SDL_Color color);
-	void setBlendMode(SDL_BlendMode blendMode);
-	void setAlpha(Uint8 alpha);
+	void set_color(SDL_Color color);
+	void set_blend_mode(SDL_BlendMode blendMode);
+	void set_alpha(Uint8 alpha);
 
-	void renderAt(int x, int y, SDL_Rect *clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
+	void render_at(int x, int y, SDL_Rect *clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 	void free();
 
 private:

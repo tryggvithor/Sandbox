@@ -19,7 +19,7 @@ public:
 
 	Dot(Texture *texture);
 
-	void handleEvent(SDL_Event &e);
+	void handle_event(SDL_Event &e);
 
 	void update(SDL_Rect &wall);
 

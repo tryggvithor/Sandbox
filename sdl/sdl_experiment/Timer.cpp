@@ -49,7 +49,7 @@ void Timer::unpause()
 }
 
 //Get the timer's time in milliseconds
-Uint32 Timer::getTicks()
+Uint32 Timer::get_ticks()
 {
 	Uint32 time = 0;
 
@@ -69,13 +69,13 @@ Uint32 Timer::getTicks()
 }
 
 //Timer is running but can be paused or unpaused
-bool Timer::isStarted()
+bool Timer::is_started()
 {
 	return started;
 }
 
 //Timer is running and is paused
-bool Timer::isPaused()
+bool Timer::is_paused()
 {
 	return paused && started;
 }

@@ -12,7 +12,7 @@
 
 
 bool init(int screenWidth, int screenHeight);
-bool loadMedia(SDL_Renderer *renderer);
+bool load_media(SDL_Renderer *renderer);
 void close();
 
 
@@ -27,7 +27,7 @@ int main(int argc, char *args[])
 		printf("Failed to initalize\n");
 		return 0;
 	}
-	if (!loadMedia(globals::renderer))
+	if (!load_media(globals::renderer))
 	{
 		printf("Failed to load media\n");
 		return 0;
@@ -48,7 +48,7 @@ int main(int argc, char *args[])
 
 	fpsTimer.start();
 	int countedFrames = 0;
-	float averageFPS = 0.0f;
+	float overallAverageFPS = 0.0f;
 
 
 	//Experiment specific stuff
@@ -89,22 +89,22 @@ int main(int argc, char *args[])
 
 				//const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-				dot.handleEvent(e);
+				dot.handle_event(e);
 			}
 		}
 
 		{//update(deltaTime)?
-			averageFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
-			if (averageFPS > 1000000)
+			overallAverageFPS = countedFrames / (fpsTimer.get_ticks() / 1000.f);
+			if (overallAverageFPS > 1000000)
 			{
-				averageFPS = 0.0f;
+				overallAverageFPS = 0.0f;
 			}
 		
 			char fpsText[64];
-			SDL_snprintf(fpsText, sizeof(fpsText), "%.3f", averageFPS);
+			SDL_snprintf(fpsText, sizeof(fpsText), "%.0f", 1000.f / deltaTime);
 
 			char shitter[10];
-			if (rectCollision(dot.collider, wall))
+			if (rect_collision(dot.collider, wall))
 			{
 				SDL_snprintf(shitter, sizeof(shitter), "%s", "YES");
 			}
@@ -115,7 +115,7 @@ int main(int argc, char *args[])
 			timeText = str_concat("FPS: ", fpsText, ", Colliding: ", shitter);
 			//timeText = utils::concat(4, "FPS: ", fpsText, "Colliding: ", shitter);
 			//timeText = utils::concat("Average capped frames per second: ", time);
-			if (!globals::timeTexture->loadFromRenderedText(timeText, globals::font))
+			if (!globals::timeTexture->load_from_rendered_text(timeText, globals::font))
 			{
 				printf("Unable to render time texture!\n");
 			}
@@ -128,11 +128,11 @@ int main(int argc, char *args[])
 			SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear(globals::renderer);
 
-			globals::startTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::startTexture->width / 2, 0);
-			globals::pauseTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
-			globals::timeTexture->renderAt(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
+			globals::startTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::startTexture->width / 2, 0);
+			globals::pauseTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
+			globals::timeTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
 
-			renderOutlineRect(globals::renderer, {0,0,0,0xFF}, wall);
+			render_outline_rect(globals::renderer, {0,0,0,0xFF}, wall);
 			dot.render();
 
 			SDL_RenderPresent(globals::renderer);
@@ -140,7 +140,7 @@ int main(int argc, char *args[])
 
 
 		countedFrames++;
-		int frameTicks = capTimer.getTicks();
+		int frameTicks = capTimer.get_ticks();
 		if (frameTicks < globals::SCREEN_TICKS_PER_FRAME)
 		{
 			SDL_Delay(globals::SCREEN_TICKS_PER_FRAME - frameTicks);
@@ -207,7 +207,7 @@ bool init(int screenWidth, int screenHeight)
 }
 
 
-bool loadMedia(SDL_Renderer *renderer)
+bool load_media(SDL_Renderer *renderer)
 {
 	bool succeeded = true;
 
@@ -218,19 +218,19 @@ bool loadMedia(SDL_Renderer *renderer)
 		succeeded = false;
 	}
 
-	if (!globals::startTexture->loadFromRenderedText("Press S to start/stop the timer", globals::font))
+	if (!globals::startTexture->load_from_rendered_text("Press S to start/stop the timer", globals::font))
 	{
 		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		succeeded = false;
 	}
 
-	if (!globals::pauseTexture->loadFromRenderedText("Press P to pause/unpause the timer", globals::font))
+	if (!globals::pauseTexture->load_from_rendered_text("Press P to pause/unpause the timer", globals::font))
 	{
 		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		succeeded = false;
 	}
 
-	if (!globals::dotTexture->loadFromFile("images/dot.bmp"))
+	if (!globals::dotTexture->load_from_file("images/dot.bmp"))
 	{
 		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		succeeded = false;

@@ -19,7 +19,7 @@ Dot::Dot(Texture *texture)
 	velY = 0;
 }
 
-void Dot::handleEvent(SDL_Event & e)
+void Dot::handle_event(SDL_Event & e)
 {
 	if (e.type == SDL_KEYDOWN && e.key.repeat == 0)
 	{
@@ -65,7 +65,7 @@ void Dot::update(SDL_Rect &wall)
 	collider.x = posX;
 
 	if (posX < 0 || posX + DOT_WIDTH > globals::SCREEN_WIDTH ||
-		rectCollision(collider, wall))
+		rect_collision(collider, wall))
 	{
 	}
 
@@ -74,12 +74,12 @@ void Dot::update(SDL_Rect &wall)
 	collider.y = posY;
 
 	if (posY < 0 || posY + DOT_HEIGHT > globals::SCREEN_HEIGHT || 
-		rectCollision(collider, wall))
+		rect_collision(collider, wall))
 	{
 	}
 }
 
 void Dot::render()
 {
-	texture->renderAt(posX, posY);
+	texture->render_at(posX, posY);
 }

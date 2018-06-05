@@ -18,7 +18,7 @@ Texture::~Texture()
 	free();
 }
 
-bool Texture::loadFromFile(const char *path, SDL_Color *transparentColor)
+bool Texture::load_from_file(const char *path, SDL_Color *transparentColor)
 {
 	free();
 
@@ -55,7 +55,7 @@ bool Texture::loadFromFile(const char *path, SDL_Color *transparentColor)
 }
 
 #ifdef _SDL_TTF_H
-bool Texture::loadFromRenderedText(const char *text, TTF_Font *font, SDL_Color color)
+bool Texture::load_from_rendered_text(const char *text, TTF_Font *font, SDL_Color color)
 {
 	free();
 
@@ -82,23 +82,23 @@ bool Texture::loadFromRenderedText(const char *text, TTF_Font *font, SDL_Color c
 #endif
 
 
-void Texture::setColor(SDL_Color color)
+void Texture::set_color(SDL_Color color)
 {
 	SDL_SetTextureColorMod(this->texture, color.r, color.g, color.b);
 }
 
-void Texture::setBlendMode(SDL_BlendMode blendMode)
+void Texture::set_blend_mode(SDL_BlendMode blendMode)
 {
 	SDL_SetTextureBlendMode(this->texture, blendMode);
 }
 
-void Texture::setAlpha(Uint8 alpha)
+void Texture::set_alpha(Uint8 alpha)
 {
 	SDL_SetTextureAlphaMod(this->texture, alpha);
 }
 
 
-void Texture::renderAt(int x, int y, SDL_Rect *clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void Texture::render_at(int x, int y, SDL_Rect *clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	SDL_Rect renderQuad = {x, y, this->width, this->height};
 	if (clip != NULL)

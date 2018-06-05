@@ -14,23 +14,23 @@ char * _str_concat(char *first, ...);
 //Collision
 
 //Rect to rect
-extern bool rectCollision(SDL_Rect a, SDL_Rect b);
+extern bool rect_collision(SDL_Rect a, SDL_Rect b);
 
 //Primitives
 
-extern void renderFillRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect);
-extern void renderOutlineRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect);
-extern void renderHorizontalLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2);
-extern void renderVerticalDottedLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2, int interval);
+extern void render_fill_rect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect);
+extern void render_outline_rect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect);
+extern void render_horizontal_line(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2);
+extern void render_vertical_dotted_line(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2, int interval);
 
 //Rendering functions
 
-extern void renderInViewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect);
+extern void render_in_viewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect);
 
 //Loading things
 
-extern SDL_Texture *loadTexture(SDL_Renderer *renderer, char *filePath);
-extern SDL_Surface *loadSurface(SDL_Surface *screenSurface, char *filePath);
+extern SDL_Texture *load_texture(SDL_Renderer *renderer, char *filePath);
+extern SDL_Surface *load_surface(SDL_Surface *screenSurface, char *filePath);
 
 
 

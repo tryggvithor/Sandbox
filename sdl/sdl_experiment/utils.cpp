@@ -81,7 +81,7 @@ static char * concat(int count, ...)
 //Collision
 
 //Rect
-extern bool rectCollision(SDL_Rect a, SDL_Rect b)
+extern bool rect_collision(SDL_Rect a, SDL_Rect b)
 {
 	return SDL_HasIntersection(&a, &b);
 }
@@ -89,25 +89,25 @@ extern bool rectCollision(SDL_Rect a, SDL_Rect b)
 
 //Primitives
 
-extern void renderFillRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
+extern void render_fill_rect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-extern void renderOutlineRect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
+extern void render_outline_rect(SDL_Renderer *renderer, SDL_Color color, SDL_Rect rect)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderDrawRect(renderer, &rect);
 }
 
-extern void renderHorizontalLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2)
+extern void render_horizontal_line(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderDrawLine(renderer, pos1.x, pos1.y, pos2.x, pos2.y);
 }
 
-extern void renderVerticalDottedLine(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2, int interval)
+extern void render_vertical_dotted_line(SDL_Renderer *renderer, SDL_Color color, SDL_Point pos1, SDL_Point pos2, int interval)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	for (int i = pos1.y; i < pos2.y; i += interval)
@@ -119,7 +119,7 @@ extern void renderVerticalDottedLine(SDL_Renderer *renderer, SDL_Color color, SD
 
 //Rendering functions
 
-extern void renderInViewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect)
+extern void render_in_viewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *viewportRect)
 {
 	SDL_Rect oldViewport;
 	SDL_RenderGetViewport(renderer, &oldViewport);
@@ -133,7 +133,7 @@ extern void renderInViewport(SDL_Renderer *renderer, SDL_Texture *texture, SDL_R
 
 //Loading things
 
-extern SDL_Texture *loadTexture(SDL_Renderer *renderer, char *filePath)
+extern SDL_Texture *load_texture(SDL_Renderer *renderer, char *filePath)
 {
 	if (renderer == NULL)
 	{
@@ -160,7 +160,7 @@ extern SDL_Texture *loadTexture(SDL_Renderer *renderer, char *filePath)
 	return newTexture;
 }
 
-extern SDL_Surface *loadSurface(SDL_Surface *screenSurface, char *filePath)
+extern SDL_Surface *load_surface(SDL_Surface *screenSurface, char *filePath)
 {
 	if (screenSurface == NULL)
 	{
