@@ -39,8 +39,12 @@ int main(int argc, char *args[])
 	//Delta time
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
-	double deltaTime = 0;
+	double dt = 0;
 
+	const int FPScount = 30;
+	double latestFPSs[FPScount] = {};
+	int latestFPSindex = 0;
+	double averageLatestFPS = 0;
 
 	char *timeText = NULL;
 	Timer fpsTimer;
@@ -48,7 +52,7 @@ int main(int argc, char *args[])
 
 	fpsTimer.start();
 	int countedFrames = 0;
-	float overallAverageFPS = 0.0f;
+	float overallAverageFPS = 0;
 
 
 	//Experiment specific stuff
@@ -65,8 +69,9 @@ int main(int argc, char *args[])
 
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
-		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
-		
+		dt = (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
+		latestFPSs[latestFPSindex] = 1000.f / dt / 1000.f;
+		latestFPSindex = ++latestFPSindex % FPScount;
 
 		{//handleInputs(e)?
 			while (SDL_PollEvent(&e) != 0)
@@ -99,11 +104,18 @@ int main(int argc, char *args[])
 			{
 				overallAverageFPS = 0.0f;
 			}
+
+			averageLatestFPS = 0;
+			for (int i = 0; i < FPScount; i++)
+			{
+				averageLatestFPS += latestFPSs[i];
+			}
+			averageLatestFPS = averageLatestFPS / FPScount;
 		
 			char fpsText[64];
-			SDL_snprintf(fpsText, sizeof(fpsText), "%.0f", 1000.f / deltaTime);
+			SDL_snprintf(fpsText, sizeof(fpsText), "%.0f", averageLatestFPS);
 
-			char * shitter = "YES";
+			char * shitter;
 			if (rect_collision(dot.collider, wall))
 			{
 				shitter = "YES";
@@ -112,16 +124,15 @@ int main(int argc, char *args[])
 			{
 				shitter = "NO";
 			}
+
 			timeText = str_concat("FPS: ", fpsText, ", Colliding: ", shitter);
-			//timeText = utils::concat(4, "FPS: ", fpsText, "Colliding: ", shitter);
-			//timeText = utils::concat("Average capped frames per second: ", time);
 			if (!globals::timeTexture->load_from_rendered_text(timeText, globals::font))
 			{
 				printf("Unable to render time texture!\n");
 			}
 			free(timeText);
 
-			dot.update(wall);
+			dot.update(dt, wall);
 		}
 
 		{//render()?
