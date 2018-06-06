@@ -67,6 +67,7 @@ void Dot::update(SDL_Rect &wall)
 	if (posX < 0 || posX + DOT_WIDTH > globals::SCREEN_WIDTH ||
 		rect_collision(collider, wall))
 	{
+		posX -= velX;
 	}
 
 
@@ -76,6 +77,7 @@ void Dot::update(SDL_Rect &wall)
 	if (posY < 0 || posY + DOT_HEIGHT > globals::SCREEN_HEIGHT || 
 		rect_collision(collider, wall))
 	{
+		posY -= velY;
 	}
 }
 

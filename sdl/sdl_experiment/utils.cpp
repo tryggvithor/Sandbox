@@ -1,3 +1,4 @@
+#include <SDL_image.h>
 #include <stdio.h>
 #include "utils.h"
 

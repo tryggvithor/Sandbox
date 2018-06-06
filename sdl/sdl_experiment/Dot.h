@@ -15,14 +15,14 @@ public:
 
 	int posX, posY;
 	int velX, velY;
-	SDL_Rect collider;
+	//Maybe instead we want the collider position to point to the position struct of this class? 
+	//Maybe we want a more general Collider structure?
+	SDL_Rect collider; 
 
 	Dot(Texture *texture);
 
 	void handle_event(SDL_Event &e);
-
 	void update(SDL_Rect &wall);
-
 	void render();
 private:
 	Texture *texture;

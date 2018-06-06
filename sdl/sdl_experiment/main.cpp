@@ -103,14 +103,14 @@ int main(int argc, char *args[])
 			char fpsText[64];
 			SDL_snprintf(fpsText, sizeof(fpsText), "%.0f", 1000.f / deltaTime);
 
-			char shitter[10];
+			char * shitter = "YES";
 			if (rect_collision(dot.collider, wall))
 			{
-				SDL_snprintf(shitter, sizeof(shitter), "%s", "YES");
+				shitter = "YES";
 			}
 			else
 			{
-				SDL_snprintf(shitter, sizeof(shitter), "%s", "NOO");
+				shitter = "NO";
 			}
 			timeText = str_concat("FPS: ", fpsText, ", Colliding: ", shitter);
 			//timeText = utils::concat(4, "FPS: ", fpsText, "Colliding: ", shitter);
@@ -132,6 +132,7 @@ int main(int argc, char *args[])
 			globals::pauseTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
 			globals::timeTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
 
+			render_fill_rect(globals::renderer, {0x4F,0x4F,0xFF,0xFF}, wall);
 			render_outline_rect(globals::renderer, {0,0,0,0xFF}, wall);
 			dot.render();
 
