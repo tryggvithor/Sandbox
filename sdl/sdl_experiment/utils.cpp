@@ -29,54 +29,6 @@ char * _str_concat(char *first, ...)
 }
 
 
-//Concatenate two char * into a new malloced char *
-/*static char * concat(const char *first, const char *second)
-{
-	//Size of both char ptrs with a null terminator
-	size_t size = (SDL_strlen(first) + SDL_strlen(second)) * sizeof(char) + 1;
-	char *concatted = (char *)malloc(size);
-	SDL_snprintf(concatted, size, "%s%s", first, second);
-	return concatted;
-}
-
-//Concatenate variable amount of char * into a new malloced char *
-static char * concat(int count, ...)
-{
-	//Size of both char ptrs with a null terminator
-	va_list args;
-	va_start(args, count);
-
-	size_t size = 0;
-	char *nice = NULL;
-	for (int i = 0; i < count - 1; ++i)
-	{
-		nice = va_arg(args, char *);
-		size += SDL_strlen(nice);
-	}
-	size = size * sizeof(char) + 1;
-
-	auto getFmt = [] (int n, const char * s)
-	{
-		size_t slen = SDL_strlen(s);
-		char * dest = (char *)malloc(n*slen + 1);
-
-		int i; char * p;
-		for (i = 0, p = dest; i < n; ++i, p += slen)
-		{
-			SDL_memcpy(p, s, slen);
-		}
-		*p = '\0';
-		return dest;
-	};
-	const char * fmt = getFmt(count, "%s");
-
-	char *concatted = (char *)malloc(size);
-	SDL_snprintf(concatted, size, fmt, args);
-	return concatted;
-}*/
-
-
-
 
 //Collision
 
