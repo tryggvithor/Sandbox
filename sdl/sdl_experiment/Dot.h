@@ -11,7 +11,7 @@ public:
 	static const int DOT_WIDTH = 20;
 	static const int DOT_HEIGHT = 20;
 
-	static const int DOT_VEL = 500;
+	static const int DOT_VEL = 400;
 
 	double posX, posY;
 	double velX, velY;

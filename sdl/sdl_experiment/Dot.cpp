@@ -61,27 +61,28 @@ void Dot::handle_event(SDL_Event & e)
 
 void Dot::update(double dt, SDL_Rect &wall)
 {
-	double frameVelX = velX * dt;
-	double frameVelY = velY * dt;
+	double nextX = posX + velX * dt;
+	double nextY = posY + velY * dt;
 
-	posX += frameVelX;
-	collider.x = posX;
-
-	if (posX < 0 || posX + DOT_WIDTH > globals::SCREEN_WIDTH ||
+	collider.x = nextX;
+	if (nextX < 0 || nextX + DOT_WIDTH > globals::SCREEN_WIDTH ||
 		rect_collision(collider, wall))
 	{
-		posX -= frameVelX;
+		nextX = posX;
+		collider.x = nextX;
 	}
 
 
-	posY += frameVelY;
-	collider.y = posY;
-
-	if (posY < 0 || posY + DOT_HEIGHT > globals::SCREEN_HEIGHT || 
+	collider.y = nextY;
+	if (nextY < 0 || nextY + DOT_HEIGHT > globals::SCREEN_HEIGHT ||
 		rect_collision(collider, wall))
 	{
-		posY -= frameVelY;
+		nextY = posY;
+		collider.y = nextY;
 	}
+
+	posX = nextX;
+	posY = nextY;
 }
 
 void Dot::render()
