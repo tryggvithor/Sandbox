@@ -7,11 +7,11 @@ Dot::Dot(Texture *texture)
 {
 	this->texture = texture;
 
-	posX = 0;
-	posY = 0;
+	posX = DOT_WIDTH/2;
+	posY = DOT_HEIGHT/2;
 
-	collider.x = 0;
-	collider.y = 0;
+	collider.x = posX - DOT_WIDTH/2;
+	collider.y = posY - DOT_HEIGHT/2;
 	collider.w = DOT_WIDTH;
 	collider.h = DOT_HEIGHT;
 
@@ -64,21 +64,21 @@ void Dot::update(double dt, SDL_Rect &wall)
 	double nextX = posX + velX * dt;
 	double nextY = posY + velY * dt;
 
-	collider.x = nextX;
-	if (nextX < 0 || nextX + DOT_WIDTH > globals::SCREEN_WIDTH ||
+	collider.x = nextX - DOT_WIDTH/2;
+	if (nextX < DOT_WIDTH/2 || nextX + DOT_WIDTH/2 > globals::SCREEN_WIDTH ||
 		rect_collision(collider, wall))
 	{
 		nextX = posX;
-		collider.x = nextX;
+		collider.x = nextX - DOT_WIDTH/2;
 	}
 
 
-	collider.y = nextY;
-	if (nextY < 0 || nextY + DOT_HEIGHT > globals::SCREEN_HEIGHT ||
+	collider.y = nextY - DOT_HEIGHT/2;
+	if (nextY < DOT_HEIGHT/2 || nextY + DOT_HEIGHT/2 > globals::SCREEN_HEIGHT ||
 		rect_collision(collider, wall))
 	{
 		nextY = posY;
-		collider.y = nextY;
+		collider.y = nextY - DOT_HEIGHT/2;
 	}
 
 	posX = nextX;
@@ -87,5 +87,5 @@ void Dot::update(double dt, SDL_Rect &wall)
 
 void Dot::render()
 {
-	texture->render_at(posX, posY);
+	texture->render_at(posX - DOT_WIDTH/2, posY - DOT_HEIGHT/2);
 }

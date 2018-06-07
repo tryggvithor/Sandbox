@@ -242,7 +242,8 @@ bool load_media(SDL_Renderer *renderer)
 		succeeded = false;
 	}
 
-	if (!globals::dotTexture->load_from_file("images/dot.bmp"))
+	SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
+	if (!globals::dotTexture->load_from_file("images/dot.bmp", &color))
 	{
 		printf("loadMedia failed, error: %s\n", SDL_GetError());
 		succeeded = false;
