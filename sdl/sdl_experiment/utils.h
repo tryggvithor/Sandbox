@@ -15,6 +15,8 @@ char * _str_concat(char *first, ...);
 
 //Rect to rect
 extern bool rect_collision(SDL_Rect a, SDL_Rect b);
+//Rect array to rect array
+extern bool rect_arrays_collision(SDL_Rect *a, SDL_Rect *b, int asize, int bsize);
 
 
 //Primitives

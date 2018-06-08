@@ -33,10 +33,24 @@ char * _str_concat(char *first, ...)
 
 //Collision
 
-//Rect
 extern bool rect_collision(SDL_Rect a, SDL_Rect b)
 {
 	return SDL_HasIntersection(&a, &b);
+}
+
+extern bool rect_arrays_collision(SDL_Rect *a, SDL_Rect *b, int asize, int bsize)
+{
+	for (int i = 0; i < asize; i++)
+	{
+		for (int j = 0; j < bsize; j++)
+		{
+			if (SDL_HasIntersection(&a[i], &b[j]))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 

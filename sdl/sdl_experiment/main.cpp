@@ -57,11 +57,13 @@ int main(int argc, char *args[])
 
 	//Experiment specific stuff
 	Dot dot = Dot(globals::dotTexture);
-	SDL_Rect wall;
-	wall.x = 300;
-	wall.y = 40;
-	wall.w = 40;
-	wall.h = 400;
+	Dot otherDot = Dot(globals::dotTexture, 
+					   globals::SCREEN_WIDTH - globals::SCREEN_WIDTH/3, 
+					   globals::SCREEN_HEIGHT - globals::SCREEN_HEIGHT/3);
+	SDL_Rect wall = {
+		300,40,
+		40,400
+	};
 
 	while (!globals::hasQuit)
 	{
@@ -115,24 +117,14 @@ int main(int argc, char *args[])
 			char fpsText[64];
 			SDL_snprintf(fpsText, sizeof(fpsText), "%.0f", averageLatestFPS);
 
-			char * shitter;
-			if (rect_collision(dot.collider, wall))
-			{
-				shitter = "YES";
-			}
-			else
-			{
-				shitter = "NO";
-			}
-
-			timeText = str_concat("FPS: ", fpsText, ", Colliding: ", shitter);
+			timeText = str_concat("FPS: ", fpsText);
 			if (!globals::timeTexture->load_from_rendered_text(timeText, globals::font))
 			{
 				printf("Unable to render time texture!\n");
 			}
 			free(timeText);
 
-			dot.update(dt, wall);
+			dot.update(dt, wall, otherDot.colliders);
 		}
 
 		{//render()?
@@ -143,9 +135,11 @@ int main(int argc, char *args[])
 			globals::pauseTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::pauseTexture->width / 2, globals::startTexture->height);
 			globals::timeTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::timeTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::timeTexture->height);
 
-			render_fill_rect(globals::renderer, {0x4F,0x4F,0xFF,0xFF}, wall);
+			render_fill_rect(globals::renderer, {0x7F,0x7F,0xFF,0xFF}, wall);
 			render_outline_rect(globals::renderer, {0,0,0,0xFF}, wall);
+
 			dot.render();
+			otherDot.render();
 
 			SDL_RenderPresent(globals::renderer);
 		}
