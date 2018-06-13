@@ -124,7 +124,7 @@ int main(int argc, char *args[])
 			}
 			free(timeText);
 
-			dot.update(dt, wall, otherDot.colliders);
+			dot.update(dt, wall, otherDot.collider);
 		}
 
 		{//render()?

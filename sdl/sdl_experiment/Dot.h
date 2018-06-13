@@ -3,6 +3,7 @@
 
 
 #include <SDL.h>
+#include "utils.h"
 #include "Texture.h"
 
 class Dot
@@ -17,14 +18,13 @@ public:
 	double velX, velY;
 	//Maybe instead we want the collider position to point to the position struct of this class? 
 	//Maybe we want a more general Collider structure?
-	SDL_Rect *colliders; 
-	int numColliders;
+	Circle collider; 
 
 	Dot(Texture *texture, double posX = DOT_WIDTH/2, double posY = DOT_HEIGHT/2);
 	~Dot();
 
 	void handle_event(SDL_Event &e);
-	void update(double dt, SDL_Rect &wall, SDL_Rect *otherColliders);
+	void update(double dt, SDL_Rect &square, Circle &circle);
 	void render();
 private:
 	Texture *texture;

@@ -4,7 +4,6 @@
 
 //Helpers
 
-//Concatenate variable amount of char * ending with a NULL into a new limited length malloced char *
 char * _str_concat(char *first, ...)
 {
 	va_list args;
@@ -30,6 +29,14 @@ char * _str_concat(char *first, ...)
 }
 
 
+double dist_sq(double x1, double y1, double x2, double y2) 
+{
+	double dx = x2 - x1;
+	double dy = y2 - y1;
+	return dx*dx + dy*dy;
+}
+
+
 
 //Collision
 
@@ -51,6 +58,34 @@ extern bool rect_arrays_collision(SDL_Rect *a, SDL_Rect *b, int asize, int bsize
 		}
 	}
 	return false;
+}
+
+extern bool circle_collision(Circle &a, Circle &b)
+{
+	double totalRadiusSquared = a.r + b.r;
+	totalRadiusSquared = totalRadiusSquared * totalRadiusSquared;
+
+	//Return if the distance between the centers of the circles is less than the sum of their radii
+	return dist_sq(a.x, a.y, b.x, b.y) < totalRadiusSquared;
+}
+
+extern bool circle_rect_collision(Circle &a, SDL_Rect &b)
+{
+	//Closest point on collision box
+	double cX, cY;
+
+	//Find closest x offset
+	if (a.x < b.x) cX = b.x;
+	else if (a.x > b.x + b.w) cX = b.x + b.w; 
+	else cX = a.x; 
+
+	//Find closest y offset
+	if (a.y < b.y) cY = b.y; 
+	else if (a.y > b.y + b.h) cY = b.y + b.h;
+	else cY = a.y; 
+
+	//Return if the closest point is inside the circle
+	return dist_sq(a.x, a.y, cX, cY) < a.r * a.r;
 }
 
 

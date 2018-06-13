@@ -13,26 +13,7 @@ Dot::Dot(Texture *texture, double posX, double posY)
 	velX = 0;
 	velY = 0;
 
-	numColliders = 6;
-	colliders = new SDL_Rect[numColliders];
-
-	colliders[0].w = 6;
-	colliders[0].h = 20;
-
-	colliders[1].w = 10;
-	colliders[1].h = 18;
-
-	colliders[2].w = 14;
-	colliders[2].h = 16;
-
-	colliders[3].w = 16;
-	colliders[3].h = 14;
-
-	colliders[4].w = 18;
-	colliders[4].h = 10;
-
-	colliders[5].w = 20;
-	colliders[5].h = 6;
+	collider.r = DOT_WIDTH / 2;
 
 
 	this->update_colliders(posX, posY);
@@ -40,7 +21,7 @@ Dot::Dot(Texture *texture, double posX, double posY)
 
 Dot::~Dot()
 {
-	delete[] colliders;
+	
 }
 
 void Dot::handle_event(SDL_Event & e)
@@ -83,15 +64,15 @@ void Dot::handle_event(SDL_Event & e)
 	}
 }
 
-void Dot::update(double dt, SDL_Rect &wall, SDL_Rect *otherColliders)
+void Dot::update(double dt, SDL_Rect &square, Circle &circle)
 {
 	double nextX = posX + velX * dt;
 	double nextY = posY + velY * dt;
 
 	this->update_colliders(nextX, posY);
 	if (nextX < DOT_WIDTH/2 || nextX + DOT_WIDTH/2 > globals::SCREEN_WIDTH ||
-		rect_arrays_collision(colliders, &wall, numColliders, 1) || 
-		rect_arrays_collision(colliders, otherColliders, numColliders, numColliders))
+		circle_collision(collider, circle) || 
+		circle_rect_collision(collider, square))
 	{
 		nextX = posX;
 		this->update_colliders(nextX, posY);
@@ -100,8 +81,8 @@ void Dot::update(double dt, SDL_Rect &wall, SDL_Rect *otherColliders)
 
 	this->update_colliders(posX, nextY);
 	if (nextY < DOT_HEIGHT/2 || nextY + DOT_HEIGHT/2 > globals::SCREEN_HEIGHT ||
-		rect_arrays_collision(colliders, &wall, numColliders, 1) ||
-		rect_arrays_collision(colliders, otherColliders, numColliders, numColliders))
+		circle_collision(collider, circle) ||
+		circle_rect_collision(collider, square))
 	{
 		nextY = posY;
 		this->update_colliders(posX, nextY);
@@ -118,10 +99,6 @@ void Dot::render()
 
 void Dot::update_colliders(double posX, double posY)
 {
-	//A bunch of rectangles in a circle
-	for (int i = 0; i < numColliders; ++i)
-	{
-		colliders[i].x = posX - colliders[i].w / 2;
-		colliders[i].y = posY - colliders[i].h / 2;
-	}
+	this->collider.x = posX;
+	this->collider.y = posY;
 }
