@@ -22,7 +22,7 @@ namespace globals
 
 	//Experiment specific stuff
 	static Texture *startTexture = NULL;
-	static Texture *timeTexture = NULL;
+	static Texture *fpsTexture = NULL;
 	static Texture *pauseTexture = NULL;
 	static Texture *dotTexture = NULL;
 	static TTF_Font *font = NULL;
