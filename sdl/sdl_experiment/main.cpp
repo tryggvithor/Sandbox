@@ -47,6 +47,8 @@ int main(int argc, char *args[])
 	double averageLatestFPS = 0;
 
 	char *timeText = NULL;
+	char *extraText = NULL;
+	char *dotText = NULL;
 	Timer fpsTimer;
 	Timer capTimer;
 
@@ -56,14 +58,15 @@ int main(int argc, char *args[])
 
 
 	//Experiment specific stuff
+	SDL_Rect camera = {
+		0, 0, 
+		globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT
+	};
+
 	Dot dot = Dot(globals::dotTexture);
 	Dot otherDot = Dot(globals::dotTexture, 
-					   globals::SCREEN_WIDTH - globals::SCREEN_WIDTH/3, 
-					   globals::SCREEN_HEIGHT - globals::SCREEN_HEIGHT/3);
-	SDL_Rect wall = {
-		300,40,
-		40,400
-	};
+					   globals::LEVEL_WIDTH - globals::LEVEL_WIDTH/3, 
+					   globals::LEVEL_HEIGHT - globals::LEVEL_HEIGHT/3);
 
 	while (!globals::hasQuit)
 	{
@@ -114,30 +117,68 @@ int main(int argc, char *args[])
 			}
 			averageLatestFPS = averageLatestFPS / FPScount;
 		
-			char fpsText[64];
-			SDL_snprintf(fpsText, sizeof(fpsText), "%.0f", averageLatestFPS);
+			char text[64];
 
-			timeText = str_concat("FPS: ", fpsText);
+			SDL_snprintf(text, sizeof(text), "%.0f", averageLatestFPS);
+			timeText = str_concat("FPS: ", text);
 			if (!globals::fpsTexture->load_from_rendered_text(timeText, globals::font))
 			{
 				printf("Unable to render time texture!\n");
 			}
 			free(timeText);
+			SDL_snprintf(text, sizeof(text), "%.0f, %.0f", otherDot.posX, otherDot.posY);
+			extraText = str_concat("Other dot: ", text);
+			if (!globals::textTexture->load_from_rendered_text(extraText, globals::font))
+			{
+				printf("Unable to render time texture!\n");
+			}
+			free(extraText);
+			SDL_snprintf(text, sizeof(text), "%.0f, %.0f", dot.posX, dot.posY);
+			dotText = str_concat("Dot: ", text);
+			if (!globals::dotTextTexture->load_from_rendered_text(dotText, globals::font))
+			{
+				printf("Unable to render time texture!\n");
+			}
+			free(dotText);
 
-			dot.update(dt, wall, otherDot.collider);
+			dot.update(dt, otherDot.collider);
+
+			{//Camera update()?
+				camera.x = (dot.posX + Dot::DOT_WIDTH / 2) - globals::SCREEN_WIDTH / 2;
+				camera.y = (dot.posY + Dot::DOT_HEIGHT / 2) - globals::SCREEN_HEIGHT / 2;
+
+				if (camera.x < 0)
+				{
+					camera.x = 0;
+				}
+				if (camera.y < 0)
+				{
+					camera.y = 0;
+				}
+				if (camera.x + camera.w > globals::LEVEL_WIDTH)
+				{
+					camera.x = globals::LEVEL_WIDTH - camera.w;
+				}
+				if (camera.y + camera.h > globals::LEVEL_HEIGHT)
+				{
+					camera.y = globals::LEVEL_HEIGHT - camera.h;
+				}
+			}
 		}
 
 		{//render()?
 			SDL_SetRenderDrawColor(globals::renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear(globals::renderer);
 
+			globals::backgroundTexture->render_at(0, 0, &camera);
+
 			globals::fpsTexture->render_at(globals::SCREEN_WIDTH / 2 - globals::fpsTexture->width / 2, globals::SCREEN_HEIGHT / 2 - globals::fpsTexture->height);
+			globals::textTexture->render_at(globals::SCREEN_WIDTH / 3 - globals::fpsTexture->width / 3, globals::SCREEN_HEIGHT / 3 - globals::fpsTexture->height);
+			globals::dotTextTexture->render_at(globals::SCREEN_WIDTH / 3 - globals::fpsTexture->width / 3, globals::SCREEN_HEIGHT / 4 - globals::fpsTexture->height);
 
-			render_fill_rect(globals::renderer, {0x7F,0x7F,0xFF,0xFF}, wall);
-			render_outline_rect(globals::renderer, {0,0,0,0xFF}, wall);
 
-			dot.render();
-			otherDot.render();
+			dot.render(camera.x, camera.y);
+			otherDot.render(0, 0);
 
 			SDL_RenderPresent(globals::renderer);
 		}
@@ -205,9 +246,12 @@ bool init()
 		}
 	
 		screenSurface = SDL_GetWindowSurface(window);
+		backgroundTexture = new Texture(renderer);
 		startTexture = new Texture(renderer);
 		pauseTexture = new Texture(renderer);
 		fpsTexture = new Texture(renderer);
+		textTexture = new Texture(renderer);
+		dotTextTexture = new Texture(renderer);
 		dotTexture = new Texture(renderer);
 	}
 
@@ -241,6 +285,12 @@ bool load_media()
 			succeeded = false;
 		}
 
+		if (!backgroundTexture->load_from_file("images/weirdbackground.png"))
+		{
+			printf("loadMedia failed, error: %s\n", SDL_GetError());
+			succeeded = false;
+		}
+
 		SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
 		if (!dotTexture->load_from_file("images/dot.bmp", &color))
 		{
@@ -259,6 +309,7 @@ void close()
 		using namespace globals;
 
 		//Textures
+		delete backgroundTexture;
 		delete startTexture;
 		delete fpsTexture;
 		delete pauseTexture;

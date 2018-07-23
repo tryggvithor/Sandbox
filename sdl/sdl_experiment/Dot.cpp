@@ -64,15 +64,14 @@ void Dot::handle_event(SDL_Event & e)
 	}
 }
 
-void Dot::update(double dt, SDL_Rect &square, Circle &circle)
+void Dot::update(double dt, Circle &circle)
 {
 	double nextX = posX + velX * dt;
 	double nextY = posY + velY * dt;
 
 	this->update_colliders(nextX, posY);
-	if (nextX < DOT_WIDTH/2 || nextX + DOT_WIDTH/2 > globals::SCREEN_WIDTH ||
-		circle_collision(collider, circle) || 
-		circle_rect_collision(collider, square))
+	if (nextX < DOT_WIDTH/2 || nextX + DOT_WIDTH/2 > globals::LEVEL_WIDTH ||
+		circle_collision(collider, circle))
 	{
 		nextX = posX;
 		this->update_colliders(nextX, posY);
@@ -80,9 +79,8 @@ void Dot::update(double dt, SDL_Rect &square, Circle &circle)
 
 
 	this->update_colliders(posX, nextY);
-	if (nextY < DOT_HEIGHT/2 || nextY + DOT_HEIGHT/2 > globals::SCREEN_HEIGHT ||
-		circle_collision(collider, circle) ||
-		circle_rect_collision(collider, square))
+	if (nextY < DOT_HEIGHT/2 || nextY + DOT_HEIGHT/2 > globals::LEVEL_HEIGHT ||
+		circle_collision(collider, circle))
 	{
 		nextY = posY;
 		this->update_colliders(posX, nextY);
@@ -92,9 +90,9 @@ void Dot::update(double dt, SDL_Rect &square, Circle &circle)
 	posY = nextY;
 }
 
-void Dot::render()
+void Dot::render(double camX, double camY)
 {
-	texture->render_at(posX - DOT_WIDTH/2, posY - DOT_HEIGHT/2);
+	texture->render_at(posX - DOT_WIDTH/2 - camX, posY - DOT_HEIGHT/2 - camY);
 }
 
 void Dot::update_colliders(double posX, double posY)
