@@ -1,4 +1,5 @@
 # Sandbox
 Coding experiments 
 
-Currently working with SDL2
+Currently project: SDL2
+Status: Back from a long hiatus
