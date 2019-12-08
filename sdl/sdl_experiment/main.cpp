@@ -21,6 +21,7 @@ void close();
 int main(int argc, char *args[])
 {
 	printf("\n");
+	printf("\n\n");
 
 	if (!init())
 	{
