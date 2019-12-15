@@ -14,7 +14,7 @@ public:
 	~Texture();
 
 	bool load_from_file(const char *path, SDL_Color *transparentColor = NULL);
-#ifdef _SDL_TTF_H
+#ifdef SDL_TTF_H_
 	bool load_from_rendered_text(const char *text, TTF_Font *font, SDL_Color color = {0x00, 0x00, 0x00, 0xFF});
 #endif
 
