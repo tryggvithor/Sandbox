@@ -1,6 +1,4 @@
 # Sandbox
-Coding experiments 
+Some experiments 
 
-Current project: Looking for another project
-
-Status: Back from a long hiatus
+Status: Found something else to do
